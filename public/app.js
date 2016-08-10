@@ -34,15 +34,17 @@ myApp.controller('game',function($scope,$window,$interval){
     $window.addEventListener('resize', resizeCanvas, false); 
     var canvasWidth = $window.innerWidth;
     var canvasHeight = $window.innerHeight;
+    // var paddleWidth = $window.innerWidth/40;
+    // var paddleHeight = $window.innerHeight/5;
     var paddleWidth = $window.innerWidth/40;
-    var paddleHeight = $window.innerHeight/5;
+    var paddleHeight = 200;
     
     var paddle1Y = (canvasHeight - paddleHeight)/2
-    var paddle2Y = (canvasHeight - paddleHeight)/2;
+    var paddle2Y = 10 || (canvasHeight - paddleHeight)/2;
 
-    var ballSize = 10;
-    var ballSpeedX = 4;
-    var ballSpeedY = 8;
+    var ballSize = 12;
+    var ballSpeedX = 6;
+    var ballSpeedY = 10;
     var ballX = canvasWidth/2;
     var ballY = canvasHeight/2;
 
@@ -122,12 +124,12 @@ myApp.controller('game',function($scope,$window,$interval){
         if(str==='goLeft') {
            //do nothing
           
-            ballSpeedX = -4;
-            ballSpeedY = -8;
+            ballSpeedX = -6;
+            ballSpeedY = -10;
         }
         else {
-            ballSpeedX = 4;
-            ballSpeedY = 8;
+            ballSpeedX = 6;
+            ballSpeedY = 10;
         }
         
         
@@ -148,15 +150,24 @@ myApp.controller('game',function($scope,$window,$interval){
                 
     }
 
+    // bundle.js:207 middle 787
+    // bundle.js:208 ballY 599
+    // bundle.js:210 delta 188
+    // bundle.js:207 middle 787
+    // bundle.js:208 ballY 519
+    // bundle.js:210 delta 268
+
+    // 787-599  186
+
     function handleHorizontal() {
         if(ballX < 0 + paddleWidth) {
             if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+                variableSpeed(paddle1Y)
 
             }
             else {
-                restartGame()
+                restartGame('goRight')
             }
         }
 
@@ -164,13 +175,37 @@ myApp.controller('game',function($scope,$window,$interval){
 
             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+                variableSpeed(paddle2Y)
             }
             else {
                 restartGame('goLeft')
             }
         }
        
+    }
+
+    function variableSpeed(paddle) {
+        var top = paddle;
+        var bottom = paddle + paddleHeight;
+
+
+        //top 20
+        //middle 50
+        //bottom 80
+        
+
+        //bally 20  //50-20 30
+        //paddleheight 200-
+        var middle = top+bottom/2;
+        
+        
+        
+
+        var delta = Math.abs(middle - ballY);
+   
+        ballSpeedX = delta * .01 * ballSpeedX;
+                
+        ballSpeedX = -ballSpeedX;
     }
 
     function handleVertical() {
