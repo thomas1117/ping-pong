@@ -84,7 +84,7 @@
 	    var paddleHeight = $window.innerHeight/5;
 	    
 	    var paddle1Y = (canvasHeight - paddleHeight)/2
-	    var paddle2Y = 30;
+	    var paddle2Y = (canvasHeight - paddleHeight)/2;
 
 	    var ballSize = 10;
 	    var ballSpeedX = 4;
@@ -160,11 +160,23 @@
 	        drawPaddle1(0,paddle1Y)
 	    }
 
-	    function restartGame(){
-	        ballSpeedX = 4;
-	        ballSpeedY = 8;
+	    function restartGame(str){
 	        ballX = canvasWidth/2;
 	        ballY = canvasHeight/2;
+	        
+
+	        if(str==='goLeft') {
+	           //do nothing
+	          
+	            ballSpeedX = -4;
+	            ballSpeedY = -8;
+	        }
+	        else {
+	            ballSpeedX = 4;
+	            ballSpeedY = 8;
+	        }
+	        
+	        
 	    }
 
 	    function drawBall() {
@@ -183,25 +195,25 @@
 	    }
 
 	    function handleHorizontal() {
-	        if(ballX < 0) {
+	        if(ballX < 0 + paddleWidth) {
 	            if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
 	                
 	                ballSpeedX = -ballSpeedX;
-	                
+
 	            }
 	            else {
 	                restartGame()
 	            }
 	        }
 
-	        else if(ballX > canvasWidth) {
+	        else if(ballX > canvasWidth -paddleWidth) {
 
 	            if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
 	                
 	                ballSpeedX = -ballSpeedX;
 	            }
 	            else {
-	                restartGame()
+	                restartGame('goLeft')
 	            }
 	        }
 	       
