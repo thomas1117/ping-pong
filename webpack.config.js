@@ -1,6 +1,14 @@
 module.exports = {
-	entry: './public/app.js',
+	entry: './app/app.js',
 	output:{
-	filename:__dirname + '/public/bundle.js'
+	filename:__dirname + '/app/bundle.js',
+	},
+	module:{
+		loaders: [
+	        {
+	            test: /\.js$/,
+	            loader: 'babel-loader'
+	        }
+    	]
 	}
 }

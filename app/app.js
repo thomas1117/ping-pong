@@ -1,5 +1,14 @@
-require('angular');
-require('angular-ui-router');
+import angular from 'angular';
+import uiRouter from 'angular-ui-router';
+
+import {drawPaddle1,drawPaddle2,drawBackground,drawBall} from './util/drawShapes.js';
+
+import * as variable from './util/constants.js';
+
+var {canvasWidth,canvasHeight,paddleWidth,paddleHeight,paddle1Y,paddle2Y,ballSize,
+    ballSpeedX,ballSpeedY,originalSpeedX,originalSpeedY,ballX,ballY,speedConst,player1Score,
+    player2Score,maxScore,frameRate} = variable;
+
 
 var myApp = angular.module('myApp',['ui.router']);
 
@@ -30,28 +39,29 @@ myApp.controller('main',function($scope){
 });
 
 myApp.controller('game',function($scope,$window,$interval){
-    $scope.load = function() {drawEverything()}
+
     $window.addEventListener('resize', resizeCanvas, false); 
-    var canvasWidth = $window.innerWidth;
-    var canvasHeight = $window.innerHeight;
-    // var paddleWidth = $window.innerWidth/40;
-    // var paddleHeight = $window.innerHeight/5;
-    var paddleWidth = $window.innerWidth/40;
-    var paddleHeight = 200;
+    $scope.load = function() {render}
     
-    var paddle1Y = (canvasHeight - paddleHeight)/2
-    var paddle2Y = 10 || (canvasHeight - paddleHeight)/2;
+    var render = $interval(function(){ drawEverything() },frameRate);
 
-    var ballSize = 12;
-    var ballSpeedX = 6;
-    var ballSpeedY = 10;
-    var ballX = canvasWidth/2;
-    var ballY = canvasHeight/2;
 
+    function drawEverything() {
+        
+        drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
+        drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
+        drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
+        ctx.font = '2rem arial';
+        ctx.fillText(player1Score,canvasWidth/4,40);    
+        ctx.fillText(player2Score,canvasWidth-canvasWidth/4,40); 
+        drawBall(ctx,ballX,ballY,ballSize);
+        moveBall();         
+}
 
     var canvas = document.getElementById("pong");
     var ctx = canvas.getContext("2d");
-  
+
+    
 
     function calculateMousePos(evt) {
         return evt.clientY;
@@ -66,9 +76,11 @@ myApp.controller('game',function($scope,$window,$interval){
             paddle1Y = mousePos - (paddleHeight/2); 
         
             if(paddle1Y <= 0) {
+
                 paddle1Y=0;
             } 
             else if(paddle1Y + paddleHeight >= canvasHeight) {
+
                 paddle1Y = canvasHeight - paddleHeight;
             }  
         })
@@ -78,68 +90,51 @@ myApp.controller('game',function($scope,$window,$interval){
        drawEverything();     
     }
 
-    function drawEverything() {
-        $interval(function(){
-
-            drawBackground(canvasWidth,canvasHeight,'#000');
-
-            drawPaddle1(0,paddle1Y,'#fff',paddleWidth,paddleHeight);
-
-            drawPaddle2(canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
-
-            drawBall();
-            moveBall();
-            
-        },20)
-        
-    }
-
-    function drawBackground(width,height,color) {
-
-        canvas.width = width;
-        canvas.height = height;
-        ctx.fillStyle = color;
-        ctx.fillRect(0,0,width,height);
-    }
-
-    function drawPaddle1(x,y,color,width,height) {
-        ctx.fillStyle = color;
-        ctx.fillRect(x,y,width,height)
-    }
-
-    function drawPaddle2(x,y,color,width,height) {
-        ctx.fillStyle = color;
-        ctx.fillRect(x,y,width,height)
-    }
-
-    function startGame() {
-        drawPaddle1(0,paddle1Y)
-    }
-
-    function restartGame(str){
+    
+       
+    
+    function resetGame(str){
         ballX = canvasWidth/2;
         ballY = canvasHeight/2;
         
 
         if(str==='goLeft') {
-           //do nothing
-          
-            ballSpeedX = -6;
-            ballSpeedY = -10;
+            
+            player1Score+=10;
+
+            ballSpeedX = -originalSpeedX;
+            ballSpeedY = -originalSpeedY;
         }
         else {
-            ballSpeedX = 6;
-            ballSpeedY = 10;
+            player2Score+=10;
+
+            ballSpeedX = originalSpeedX;
+            ballSpeedY = originalSpeedY;
         }
+
+        handleScore(player1Score,player2Score)
         
         
     }
 
-    function drawBall() {
-        ctx.beginPath();
-        ctx.arc(ballX, ballY, ballSize, 0, Math.PI*2);
-        ctx.fill();
+    function handleScore(p1,p2) {
+       
+        if(p1 === maxScore || p2 === maxScore) {
+            $interval(function(){
+                $interval.cancel(render)
+            },frameRate);
+
+            gameEnd();
+            
+        }
+        
     }
+
+    function gameEnd() {
+        console.log('game ended')
+    }
+
+
 
     function moveBall() {
         ballX += ballSpeedX;
@@ -150,24 +145,20 @@ myApp.controller('game',function($scope,$window,$interval){
                 
     }
 
-    // bundle.js:207 middle 787
-    // bundle.js:208 ballY 599
-    // bundle.js:210 delta 188
-    // bundle.js:207 middle 787
-    // bundle.js:208 ballY 519
-    // bundle.js:210 delta 268
-
-    // 787-599  186
 
     function handleHorizontal() {
         if(ballX < 0 + paddleWidth) {
             if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
                 
+                ballSpeedX = -ballSpeedX;
                 variableSpeed(paddle1Y)
 
             }
             else {
-                restartGame('goRight')
+                if(ballX < 0) {
+                    resetGame('goRight')
+                }
+                
             }
         }
 
@@ -175,37 +166,25 @@ myApp.controller('game',function($scope,$window,$interval){
 
             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
+                ballSpeedX = -ballSpeedX;
                 variableSpeed(paddle2Y)
             }
             else {
-                restartGame('goLeft')
+                if(ballX > canvasWidth){
+                    resetGame('goLeft')
+                }
+                
             }
         }
        
     }
 
     function variableSpeed(paddle) {
-        var top = paddle;
-        var bottom = paddle + paddleHeight;
 
+        var deltaY = ballY - (paddle +paddleHeight/2);
 
-        //top 20
-        //middle 50
-        //bottom 80
+        ballSpeedY = deltaY * speedConst;   
         
-
-        //bally 20  //50-20 30
-        //paddleheight 200-
-        var middle = top+bottom/2;
-        
-        
-        
-
-        var delta = Math.abs(middle - ballY);
-   
-        ballSpeedX = delta * .01 * ballSpeedX;
-                
-        ballSpeedX = -ballSpeedX;
     }
 
     function handleVertical() {
