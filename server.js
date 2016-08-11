@@ -11,10 +11,22 @@ http.listen(app.get('port'), function() {
 });
 
 io.on('connection', function(socket){
-  console.log('we have a new connection');
-  socket.emit('myMessage','Hi there');
-});
+  	
+  	socket.on('moveY',function(req){
+  		sendPlayerData(req);
+
+
+	});
+})
+
 
 app.get('/',function(req,res){
 	res.sendFile(__dirname + '/public/index.html')
 })
+
+function sendPlayerData(req) {
+	
+	io.sockets.emit('player1Move',{
+		position:req.position
+	})
+};

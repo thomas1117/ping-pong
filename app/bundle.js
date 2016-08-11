@@ -1,41 +1,41 @@
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -45,25 +45,27 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
+	
 	var _angular = __webpack_require__(1);
-
+	
 	var _angular2 = _interopRequireDefault(_angular);
-
+	
 	var _angularUiRouter = __webpack_require__(3);
-
+	
 	var _angularUiRouter2 = _interopRequireDefault(_angularUiRouter);
-
+	
 	var _drawShapes = __webpack_require__(4);
-
+	
 	var _constants = __webpack_require__(5);
-
+	
 	var variable = _interopRequireWildcard(_constants);
-
+	
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
-
+	
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+	
+	var randomstring = __webpack_require__(6);
+	
 	var centerX = variable.centerX;
 	var centerY = variable.centerY;
 	var canvasWidth = variable.canvasWidth;
@@ -84,134 +86,156 @@
 	var player2Score = variable.player2Score;
 	var maxScore = variable.maxScore;
 	var frameRate = variable.frameRate;
-
-
+	
+	
 	var myApp = _angular2.default.module('myApp', ['ui.router']);
-
+	
 	myApp.config(function ($stateProvider, $urlRouterProvider) {
 	    $urlRouterProvider.otherwise('/landing');
-
+	
 	    $stateProvider.state('landing', {
 	        url: '/landing',
 	        templateUrl: './components/landing.html',
 	        controller: 'main'
 	    }).state('game', {
 	        url: '/game',
-	        templateUrl: '../components/game.html',
+	        templateUrl: './components/game.html',
 	        controller: 'game'
-
+	
 	    });
 	});
-
-	myApp.controller('main', function ($scope) {});
-
+	
+	myApp.controller('main', function ($scope) {
+	
+	    $scope.generateGame = function (user) {
+	        var group = randomstring();
+	
+	        console.log(group);
+	    };
+	});
+	
 	myApp.controller('game', function ($scope, $window, $interval) {
-
+	
 	    var canvas = document.getElementById("pong");
 	    var ctx = canvas.getContext("2d");
-
-	    $window.addEventListener('resize', resizeCanvas, false);
-	    $scope.load = function () {
-	        render;
-	    };
-
+	
 	    var render = $interval(function () {
 	        drawEverything();
 	    }, frameRate);
-
+	
+	    $window.addEventListener('resize', drawEverything, false);
+	
+	    $scope.load = function () {
+	        render;
+	    };
+	
 	    function drawEverything() {
-
+	
 	        (0, _drawShapes.drawBackground)(canvas, ctx, canvasWidth, canvasHeight, '#000');
-
+	
 	        (0, _drawShapes.drawPaddle1)(ctx, 0, paddle1Y, '#fff', paddleWidth, paddleHeight);
 	        (0, _drawShapes.drawPaddle2)(ctx, canvasWidth - paddleWidth, paddle2Y, '#fff', paddleWidth, paddleHeight);
-
+	
 	        (0, _drawShapes.drawScores)(ctx, player1Score, player2Score, canvasWidth);
-
+	
 	        (0, _drawShapes.drawBall)(ctx, ballX, ballY, ballSize);
-
+	
 	        moveBall();
 	    }
-
-	    function resizeCanvas() {
-	        drawEverything();
-	    }
-
+	
 	    function calculateMousePos(evt) {
 	        return evt.clientY;
 	    }
-
+	
+	    socket.on('connect', function () {
+	
+	        socket.on("player1Move", function (resp) {
+	            paddle2Y = resp.position;
+	        });
+	    });
+	
 	    canvas.addEventListener('mousemove', function (event) {
-
+	
+	        //socket user check??
+	
+	        /*if(user1){
+	            socket.emit("moveY",{position:paddle1Y})
+	         else {socket.emit("moveY",{position:paddle2Y})}
+	         }*/
+	
 	        var mousePos = calculateMousePos(event);
-
+	
 	        paddle1Y = mousePos - paddleHeight / 2;
-
+	
 	        if (paddle1Y <= 0) {
-
+	
 	            paddle1Y = 0;
 	        } else if (paddle1Y + paddleHeight >= canvasHeight) {
-
+	
 	            paddle1Y = canvasHeight - paddleHeight;
 	        }
+	
+	        socket.emit("moveY", {
+	            position: paddle1Y
+	        });
 	    });
-
+	
 	    function resetGame(str) {
-
+	
 	        ballX = centerX;
 	        ballY = centerY;
-
+	
 	        if (str === 'goLeft') {
-
-	            player1Score += 10;
-
+	
+	            player1Score += 1;
+	
 	            ballSpeedX = -originalSpeedX;
 	            ballSpeedY = -originalSpeedY;
 	        } else {
-	            player2Score += 10;
-
+	            player2Score += 1;
+	
 	            ballSpeedX = originalSpeedX;
 	            ballSpeedY = originalSpeedY;
 	        }
-
+	
 	        handleScore(player1Score, player2Score);
 	    }
-
+	
 	    function handleScore(p1, p2) {
-
+	
 	        if (p1 === maxScore || p2 === maxScore) {
 	            $interval(function () {
 	                $interval.cancel(render);
 	            }, frameRate);
-
+	
 	            gameEnd();
 	        }
 	        return;
 	    }
-
+	
 	    function gameEnd() {
 	        drawText();
 	    }
-
+	
 	    function drawText() {
 	        $interval(function () {
 	            ctx.font = '2rem arial';
 	            ctx.fillText("play again?", canvasWidth / 2, canvasHeight / 3);
 	        }, frameRate);
 	    }
-
+	
 	    function moveBall() {
 	        ballX += ballSpeedX;
 	        ballY += ballSpeedY;
-
+	
 	        handleHorizontal();
 	        handleVertical();
 	    }
-
+	
 	    function handleHorizontal() {
 	        if (ballX < 0 + paddleWidth) {
 	            if (ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
-
+	
 	                ballSpeedX = -ballSpeedX;
 	                variableSpeed(paddle1Y);
 	            } else {
@@ -220,9 +244,9 @@
 	                }
 	            }
 	        } else if (ballX > canvasWidth - paddleWidth) {
-
+	
 	            if (ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
-
+	
 	                ballSpeedX = -ballSpeedX;
 	                variableSpeed(paddle2Y);
 	            } else {
@@ -232,20 +256,20 @@
 	            }
 	        }
 	    }
-
+	
 	    function variableSpeed(paddle) {
-
+	
 	        var deltaY = ballY - (paddle + paddleHeight / 2);
-
+	
 	        ballSpeedY = deltaY * speedConst;
 	    }
-
+	
 	    function handleVertical() {
 	        if (ballY > canvasHeight) {
-
+	
 	            ballSpeedY = -ballSpeedY;
 	        } else if (ballY <= 0) {
-
+	
 	            ballSpeedY = -ballSpeedY;
 	        }
 	    }
@@ -256,7 +280,7 @@
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
+	
 	__webpack_require__(2);
 	module.exports = angular;
 
@@ -309,7 +333,7 @@
 	  uid: true,
 	  REGEX_STRING_REGEXP: true,
 	  VALIDITY_STATE_PROPERTY: true,
-
+	
 	  lowercase: true,
 	  uppercase: true,
 	  manualLowercase: true,
@@ -381,7 +405,7 @@
 	  getBlockNodes: true,
 	  hasOwnProperty: true,
 	  createMap: true,
-
+	
 	  NODE_TYPE_ELEMENT: true,
 	  NODE_TYPE_ATTRIBUTE: true,
 	  NODE_TYPE_TEXT: true,
@@ -546,12 +570,12 @@
 	   function transformer(transformationFn, value) {
 	     return (transformationFn || angular.identity)(value);
 	   };
-
+	
 	   // E.g.
 	   function getResult(fn, input) {
 	     return (fn || angular.identity)(input);
 	   };
-
+	
 	   getResult(function(n) { return n * 2; }, 21);   // returns 42
 	   getResult(null, 21);                            // returns 21
 	   getResult(undefined, 21);                       // returns 21
@@ -739,17 +763,17 @@
 	        module('copyExample', []).
 	        controller('ExampleController', ['$scope', function($scope) {
 	          $scope.master = {};
-
+	
 	          $scope.reset = function() {
 	            // Example with 1 argument
 	            $scope.user = angular.copy($scope.master);
 	          };
-
+	
 	          $scope.update = function(user) {
 	            // Example with 2 arguments
 	            angular.copy(user, $scope.master);
 	          };
-
+	
 	          $scope.reset();
 	        }]);
 	    </file>
@@ -798,11 +822,11 @@
 	          <h3>User 1</h3>
 	          Name: <input type="text" ng-model="user1.name">
 	          Age: <input type="number" ng-model="user1.age">
-
+	
 	          <h3>User 2</h3>
 	          Name: <input type="text" ng-model="user2.name">
 	          Age: <input type="number" ng-model="user2.age">
-
+	
 	          <div>
 	            <br/>
 	            <input type="button" value="Compare" ng-click="compare()">
@@ -1026,26 +1050,26 @@
 	   <div ng-app="ngAppStrictDemo" ng-strict-di>
 	       <div ng-controller="GoodController1">
 	           I can add: {{a}} + {{b}} =  {{ a+b }}
-
+	
 	           <p>This renders because the controller does not fail to
 	              instantiate, by using explicit annotation style (see
 	              script.js for details)
 	           </p>
 	       </div>
-
+	
 	       <div ng-controller="GoodController2">
 	           Name: <input ng-model="name"><br />
 	           Hello, {{name}}!
-
+	
 	           <p>This renders because the controller does not fail to
 	              instantiate, by using explicit annotation style
 	              (see script.js for details)
 	           </p>
 	       </div>
-
+	
 	       <div ng-controller="BadController">
 	           I can add: {{a}} + {{b}} =  {{ a+b }}
-
+	
 	           <p>The controller could not be instantiated, due to relying
 	              on automatic function annotations (which are disabled in
 	              strict mode). As such, the content of this section is not
@@ -1446,9 +1470,9 @@
 	 * Assumes that there are no proto properties for objects.
 	 */function shallowCopy(src,dst){if(isArray(src)){dst=dst||[];for(var i=0,ii=src.length;i<ii;i++){dst[i]=src[i];}}else if(isObject(src)){dst=dst||{};for(var key in src){if(!(key.charAt(0)==='$'&&key.charAt(1)==='$')){dst[key]=src[key];}}}return dst||src;}/* global toDebugString: true */function serializeObject(obj){var seen=[];return JSON.stringify(obj,function(key,val){val=toJsonReplacer(key,val);if(isObject(val)){if(seen.indexOf(val)>=0)return'...';seen.push(val);}return val;});}function toDebugString(obj){if(typeof obj==='function'){return obj.toString().replace(/ \{[\s\S]*$/,'');}else if(isUndefined(obj)){return'undefined';}else if(typeof obj!=='string'){return serializeObject(obj);}return obj;}/* global angularModule: true,
 	  version: true,
-
+	
 	  $CompileProvider,
-
+	
 	  htmlAnchorDirective,
 	  inputDirective,
 	  inputDirective,
@@ -1496,7 +1520,7 @@
 	  ngModelOptionsDirective,
 	  ngAttributeAliasDirectives,
 	  ngEventDirectives,
-
+	
 	  $AnchorScrollProvider,
 	  $AnimateProvider,
 	  $CoreAnimateCssProvider,
@@ -2104,7 +2128,7 @@
 	 *     {@link auto.$injector#instantiate $injector.instantiate()}, then treated as `object`.
 	 *
 	 * @returns {Object} registered provider instance
-
+	
 	 * @example
 	 *
 	 * The following example shows how to create a simple event tracking service and register it using
@@ -2437,7 +2461,7 @@
 	                 // set the location.hash to the id of
 	                 // the element you wish to scroll to.
 	                 $location.hash('bottom');
-
+	
 	                 // call $anchorScroll()
 	                 $anchorScroll();
 	               };
@@ -2448,7 +2472,7 @@
 	           height: 280px;
 	           overflow: auto;
 	         }
-
+	
 	         #bottom {
 	           display: block;
 	           margin-top: 2000px;
@@ -2498,19 +2522,19 @@
 	         body {
 	           padding-top: 50px;
 	         }
-
+	
 	         .anchor {
 	           border: 2px dashed DarkOrchid;
 	           padding: 10px 10px 200px 10px;
 	         }
-
+	
 	         .fixed-header {
 	           background-color: rgba(0, 0, 0, 0.2);
 	           height: 50px;
 	           position: fixed;
 	           top: 0; left: 0; right: 0;
 	         }
-
+	
 	         .fixed-header > a {
 	           display: inline-block;
 	           margin: 5px 15px;
@@ -3130,14 +3154,14 @@
 	         <input ng-model="newCacheKey" placeholder="Key">
 	         <input ng-model="newCacheValue" placeholder="Value">
 	         <button ng-click="put(newCacheKey, newCacheValue)">Cache</button>
-
+	
 	         <p ng-if="keys.length">Cached Values</p>
 	         <div ng-repeat="key in keys">
 	           <span ng-bind="key"></span>
 	           <span>: </span>
 	           <b ng-bind="cache.get(key)"></b>
 	         </div>
-
+	
 	         <p>Cache Info</p>
 	         <div ng-repeat="(key, value) in cache.info()">
 	           <span ng-bind="key"></span>
@@ -3876,7 +3900,7 @@
 	 * apply to all cloned DOM nodes within the compile function. Specifically, DOM listener registration
 	 * should be done in a linking function rather than in a compile function.
 	 * </div>
-
+	
 	 * <div class="alert alert-warning">
 	 * **Note:** The compile function cannot handle directives that recursively use themselves in their
 	 * own templates or compile functions. Compiling these directives results in an infinite loop and
@@ -3892,7 +3916,7 @@
 	 *   e.g. does not know about the right outer scope. Please use the transclude function that is passed
 	 *   to the link function instead.
 	 * </div>
-
+	
 	 * A compile function can have a return value which can be either a function or an object.
 	 *
 	 * * returning a (post-link) function - is equivalent to registering the linking function via the
@@ -4162,7 +4186,7 @@
 	                // when the 'compile' expression changes
 	                // assign it into the current DOM
 	                element.html(value);
-
+	
 	                // compile the new DOM and link it to the current
 	                // scope.
 	                // NOTE: we only compile .childNodes so that
@@ -4196,7 +4220,7 @@
 	     });
 	   </file>
 	 </example>
-
+	
 	 *
 	 *
 	 * @param {string|DOMElement} element Element or HTML string to compile into a template function.
@@ -5704,11 +5728,11 @@
 	      function($scope, $http, $templateCache) {
 	        $scope.method = 'GET';
 	        $scope.url = 'http-hello.html';
-
+	
 	        $scope.fetch = function() {
 	          $scope.code = null;
 	          $scope.response = null;
-
+	
 	          $http({method: $scope.method, url: $scope.url, cache: $templateCache}).
 	            then(function(response) {
 	              $scope.status = response.status;
@@ -5718,7 +5742,7 @@
 	              $scope.status = response.status;
 	          });
 	        };
-
+	
 	        $scope.updateModel = function(method, url) {
 	          $scope.method = method;
 	          $scope.url = url;
@@ -5735,14 +5759,14 @@
 	  var sampleGetBtn = element(by.id('samplegetbtn'));
 	  var sampleJsonpBtn = element(by.id('samplejsonpbtn'));
 	  var invalidJsonpBtn = element(by.id('invalidjsonpbtn'));
-
+	
 	  it('should make an xhr GET request', function() {
 	    sampleGetBtn.click();
 	    fetchBtn.click();
 	    expect(status.getText()).toMatch('200');
 	    expect(data.getText()).toMatch(/Hello, \$http!/);
 	  });
-
+	
 	// Commented out due to flakes. See https://github.com/angular/angular.js/issues/9185
 	// it('should make a JSONP request to angularjs.org', function() {
 	//   sampleJsonpBtn.click();
@@ -5750,7 +5774,7 @@
 	//   expect(status.getText()).toMatch('200');
 	//   expect(data.getText()).toMatch(/Super Hero!/);
 	// });
-
+	
 	  it('should make JSONP request to invalid URL and invoke the error handler',
 	      function() {
 	    invalidJsonpBtn.click();
@@ -5948,13 +5972,13 @@
 	<file name="index.html">
 	<script>
 	  var customInterpolationApp = angular.module('customInterpolationApp', []);
-
+	
 	  customInterpolationApp.config(function($interpolateProvider) {
 	    $interpolateProvider.startSymbol('//');
 	    $interpolateProvider.endSymbol('//');
 	  });
-
-
+	
+	
 	  customInterpolationApp.controller('DemoController', function() {
 	      this.label = "This binding is brought you by // interpolation symbols.";
 	  });
@@ -7380,10 +7404,10 @@
 	     * ```js
 	         var parent = $rootScope;
 	         var child = parent.$new();
-
+	
 	         parent.salutation = "Hello";
 	         expect(child.salutation).toEqual('Hello');
-
+	
 	         child.salutation = "Welcome";
 	         expect(child.salutation).toEqual('Welcome');
 	         expect(parent.salutation).toEqual('Hello');
@@ -7503,27 +7527,27 @@
 	           var scope = $rootScope;
 	           scope.name = 'misko';
 	           scope.counter = 0;
-
+	
 	           expect(scope.counter).toEqual(0);
 	           scope.$watch('name', function(newValue, oldValue) {
 	             scope.counter = scope.counter + 1;
 	           });
 	           expect(scope.counter).toEqual(0);
-
+	
 	           scope.$digest();
 	           // the listener is always called during the first $digest loop after it was registered
 	           expect(scope.counter).toEqual(1);
-
+	
 	           scope.$digest();
 	           // but now it will not be called unless the value changes
 	           expect(scope.counter).toEqual(1);
-
+	
 	           scope.name = 'adam';
 	           scope.$digest();
 	           expect(scope.counter).toEqual(2);
-
-
-
+	
+	
+	
 	           // Using a function as a watchExpression
 	           var food;
 	           scope.foodCounter = 0;
@@ -7541,16 +7565,16 @@
 	           );
 	           // No digest has been run so the counter will be zero
 	           expect(scope.foodCounter).toEqual(0);
-
+	
 	           // Run the digest but since food has not changed count will still be zero
 	           scope.$digest();
 	           expect(scope.foodCounter).toEqual(0);
-
+	
 	           // Update food and run digest.  Now the counter will increment
 	           food = 'cheeseburger';
 	           scope.$digest();
 	           expect(scope.foodCounter).toEqual(1);
-
+	
 	       * ```
 	       *
 	       *
@@ -7618,20 +7642,20 @@
 	       * ```js
 	          $scope.names = ['igor', 'matias', 'misko', 'james'];
 	          $scope.dataCount = 4;
-
+	
 	          $scope.$watchCollection('names', function(newNames, oldNames) {
 	            $scope.dataCount = newNames.length;
 	          });
-
+	
 	          expect($scope.dataCount).toEqual(4);
 	          $scope.$digest();
-
+	
 	          //still at 4 ... no changes
 	          expect($scope.dataCount).toEqual(4);
-
+	
 	          $scope.names.pop();
 	          $scope.$digest();
-
+	
 	          //now there's been a change
 	          expect($scope.dataCount).toEqual(3);
 	       * ```
@@ -7698,21 +7722,21 @@
 	           var scope = ...;
 	           scope.name = 'misko';
 	           scope.counter = 0;
-
+	
 	           expect(scope.counter).toEqual(0);
 	           scope.$watch('name', function(newValue, oldValue) {
 	             scope.counter = scope.counter + 1;
 	           });
 	           expect(scope.counter).toEqual(0);
-
+	
 	           scope.$digest();
 	           // the listener is always called during the first $digest loop after it was registered
 	           expect(scope.counter).toEqual(1);
-
+	
 	           scope.$digest();
 	           // but now it will not be called unless the value changes
 	           expect(scope.counter).toEqual(1);
-
+	
 	           scope.name = 'adam';
 	           scope.$digest();
 	           expect(scope.counter).toEqual(2);
@@ -7788,7 +7812,7 @@
 	           var scope = ng.$rootScope.Scope();
 	           scope.a = 1;
 	           scope.b = 2;
-
+	
 	           expect(scope.$eval('a+b')).toEqual(3);
 	           expect(scope.$eval(function(scope){ return scope.a + scope.b; })).toEqual(3);
 	       * ```
@@ -9136,7 +9160,7 @@
 	        <h3>{{ filteredText }}</h3>
 	       </div>
 	     </file>
-
+	
 	     <file name="script.js">
 	      angular.module('filterExample', [])
 	      .controller('MainCtrl', function($scope, $filter) {
@@ -9243,7 +9267,7 @@
 	                                {name:'Adam', phone:'555-5678'},
 	                                {name:'Julie', phone:'555-8765'},
 	                                {name:'Juliette', phone:'555-5678'}]"></div>
-
+	
 	       <label>Search: <input ng-model="searchText"></label>
 	       <table id="searchTextResults">
 	         <tr><th>Name</th><th>Phone</th></tr>
@@ -9273,18 +9297,18 @@
 	           });
 	         });
 	       };
-
+	
 	       it('should search across all fields when filtering with a string', function() {
 	         var searchText = element(by.model('searchText'));
 	         searchText.clear();
 	         searchText.sendKeys('m');
 	         expectFriendNames(['Mary', 'Mike', 'Adam'], 'friend');
-
+	
 	         searchText.clear();
 	         searchText.sendKeys('76');
 	         expectFriendNames(['John', 'Julie'], 'friend');
 	       });
-
+	
 	       it('should search in specific fields when filtering with a predicate object', function() {
 	         var searchAny = element(by.model('search.$'));
 	         searchAny.clear();
@@ -9405,7 +9429,7 @@
 	         expect(element(by.binding('val | number:0')).getText()).toBe('1,235');
 	         expect(element(by.binding('-val | number:4')).getText()).toBe('-1,234.5679');
 	       });
-
+	
 	       it('should update', function() {
 	         element(by.model('val')).clear();
 	         element(by.model('val')).sendKeys('3374.333');
@@ -9676,7 +9700,7 @@
 	       var limitedNumbers = element(by.binding('numbers | limitTo:numLimit'));
 	       var limitedLetters = element(by.binding('letters | limitTo:letterLimit'));
 	       var limitedLongNumber = element(by.binding('longNumber | limitTo:longNumberLimit'));
-
+	
 	       it('should limit the number array to first three items', function() {
 	         expect(numLimitInput.getAttribute('value')).toBe('3');
 	         expect(letterLimitInput.getAttribute('value')).toBe('3');
@@ -9685,7 +9709,7 @@
 	         expect(limitedLetters.getText()).toEqual('Output letters: abc');
 	         expect(limitedLongNumber.getText()).toEqual('Output long number: 234');
 	       });
-
+	
 	       // There is a bug in safari and protractor that doesn't like the minus key
 	       // it('should update the output when -3 is entered', function() {
 	       //   numLimitInput.clear();
@@ -9698,7 +9722,7 @@
 	       //   expect(limitedLetters.getText()).toEqual('Output letters: ghi');
 	       //   expect(limitedLongNumber.getText()).toEqual('Output long number: 342');
 	       // });
-
+	
 	       it('should not exceed the maximum size of input array', function() {
 	         numLimitInput.clear();
 	         numLimitInput.sendKeys('100');
@@ -9869,7 +9893,7 @@
 	       .friends {
 	         border-collapse: collapse;
 	       }
-
+	
 	       .friends th {
 	         border-bottom: 1px solid;
 	       }
@@ -9884,7 +9908,7 @@
 	     <file name="protractor.js" type="protractor">
 	       // Element locators
 	       var names = element.all(by.repeater('friends').column('friend.name'));
-
+	
 	       it('should sort friends by age in reverse order', function() {
 	         expect(names.get(0).getText()).toBe('Adam');
 	         expect(names.get(1).getText()).toBe('Julie');
@@ -9942,11 +9966,11 @@
 	             {name: 'Adam',   phone: '555-5678',  age: 35},
 	             {name: 'Julie',  phone: '555-8765',  age: 29}
 	           ];
-
+	
 	           $scope.propertyName = 'age';
 	           $scope.reverse = true;
 	           $scope.friends = friends;
-
+	
 	           $scope.sortBy = function(propertyName) {
 	             $scope.reverse = ($scope.propertyName === propertyName) ? !$scope.reverse : false;
 	             $scope.propertyName = propertyName;
@@ -9957,7 +9981,7 @@
 	       .friends {
 	         border-collapse: collapse;
 	       }
-
+	
 	       .friends th {
 	         border-bottom: 1px solid;
 	       }
@@ -9968,7 +9992,7 @@
 	       .friends td:first-child, .friends th:first-child {
 	         border-left: none;
 	       }
-
+	
 	       .sortorder:after {
 	         content: '\25b2';   // BLACK UP-POINTING TRIANGLE
 	       }
@@ -9984,41 +10008,41 @@
 	       var ageHeader = element(by.partialButtonText('Age'));
 	       var firstName = element(by.repeater('friends').column('friend.name').row(0));
 	       var lastName = element(by.repeater('friends').column('friend.name').row(4));
-
+	
 	       it('should sort friends by some property, when clicking on the column header', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         phoneHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Mary');
-
+	
 	         nameHeader.click();
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('Mike');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Adam');
 	       });
-
+	
 	       it('should sort friends in reverse order, when clicking on the same column', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Adam');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
 	       });
-
+	
 	       it('should restore the original order, when clicking "Set to unsorted"', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         unsortButton.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Julie');
@@ -10074,11 +10098,11 @@
 	             {name: 'Adam',   phone: '555-5678',  age: 35},
 	             {name: 'Julie',  phone: '555-8765',  age: 29}
 	           ];
-
+	
 	           $scope.propertyName = 'age';
 	           $scope.reverse = true;
 	           $scope.friends = orderBy(friends, $scope.propertyName, $scope.reverse);
-
+	
 	           $scope.sortBy = function(propertyName) {
 	             $scope.reverse = (propertyName !== null && $scope.propertyName === propertyName)
 	                 ? !$scope.reverse : false;
@@ -10091,7 +10115,7 @@
 	       .friends {
 	         border-collapse: collapse;
 	       }
-
+	
 	       .friends th {
 	         border-bottom: 1px solid;
 	       }
@@ -10102,7 +10126,7 @@
 	       .friends td:first-child, .friends th:first-child {
 	         border-left: none;
 	       }
-
+	
 	       .sortorder:after {
 	         content: '\25b2';   // BLACK UP-POINTING TRIANGLE
 	       }
@@ -10118,41 +10142,41 @@
 	       var ageHeader = element(by.partialButtonText('Age'));
 	       var firstName = element(by.repeater('friends').column('friend.name').row(0));
 	       var lastName = element(by.repeater('friends').column('friend.name').row(4));
-
+	
 	       it('should sort friends by some property, when clicking on the column header', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         phoneHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Mary');
-
+	
 	         nameHeader.click();
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('Mike');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Adam');
 	       });
-
+	
 	       it('should sort friends in reverse order, when clicking on the same column', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Adam');
-
+	
 	         ageHeader.click();
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
 	       });
-
+	
 	       it('should restore the original order, when clicking "Set to unsorted"', function() {
 	         expect(firstName.getText()).toBe('Adam');
 	         expect(lastName.getText()).toBe('John');
-
+	
 	         unsortButton.click();
 	         expect(firstName.getText()).toBe('John');
 	         expect(lastName.getText()).toBe('Julie');
@@ -10210,13 +10234,13 @@
 	             {name: 'Adam',   favoriteLetter: 'H'},
 	             {name: 'Julie',  favoriteLetter: 'Z'}
 	           ];
-
+	
 	           $scope.localeSensitiveComparator = function(v1, v2) {
 	             // If we don't get strings, just compare by index
 	             if (v1.type !== 'string' || v2.type !== 'string') {
 	               return (v1.index < v2.index) ? -1 : 1;
 	             }
-
+	
 	             // Compare strings alphabetically, taking locale into account
 	             return v1.value.localeCompare(v2.value);
 	           };
@@ -10227,11 +10251,11 @@
 	         display: inline-block;
 	         margin: 0 30px;
 	       }
-
+	
 	       .friends {
 	         border-collapse: collapse;
 	       }
-
+	
 	       .friends th {
 	         border-bottom: 1px solid;
 	       }
@@ -10247,7 +10271,7 @@
 	       // Element locators
 	       var container = element(by.css('.custom-comparator'));
 	       var names = container.all(by.repeater('friends').column('friend.name'));
-
+	
 	       it('should sort friends by favorite letter (in correct alphabetical order)', function() {
 	         expect(names.get(0).getText()).toBe('John');
 	         expect(names.get(1).getText()).toBe('Adam');
@@ -10331,47 +10355,47 @@
 	          expect(element(by.model('value')).getAttribute('value')).toEqual('1');
 	          expect(element(by.id('link-1')).getAttribute('href')).toBe('');
 	        });
-
+	
 	        it('should execute ng-click but not reload when href empty string', function() {
 	          element(by.id('link-2')).click();
 	          expect(element(by.model('value')).getAttribute('value')).toEqual('2');
 	          expect(element(by.id('link-2')).getAttribute('href')).toBe('');
 	        });
-
+	
 	        it('should execute ng-click and change url when ng-href specified', function() {
 	          expect(element(by.id('link-3')).getAttribute('href')).toMatch(/\/123$/);
-
+	
 	          element(by.id('link-3')).click();
-
+	
 	          // At this point, we navigate away from an Angular page, so we need
 	          // to use browser.driver to get the base webdriver.
-
+	
 	          browser.wait(function() {
 	            return browser.driver.getCurrentUrl().then(function(url) {
 	              return url.match(/\/123$/);
 	            });
 	          }, 5000, 'page should navigate to /123');
 	        });
-
+	
 	        it('should execute ng-click but not reload when href empty string and name specified', function() {
 	          element(by.id('link-4')).click();
 	          expect(element(by.model('value')).getAttribute('value')).toEqual('4');
 	          expect(element(by.id('link-4')).getAttribute('href')).toBe('');
 	        });
-
+	
 	        it('should execute ng-click but not reload when no href but name specified', function() {
 	          element(by.id('link-5')).click();
 	          expect(element(by.model('value')).getAttribute('value')).toEqual('5');
 	          expect(element(by.id('link-5')).getAttribute('href')).toBe(null);
 	        });
-
+	
 	        it('should only change url when only ng-href', function() {
 	          element(by.model('value')).clear();
 	          element(by.model('value')).sendKeys('6');
 	          expect(element(by.id('link-6')).getAttribute('href')).toMatch(/\/6$/);
-
+	
 	          element(by.id('link-6')).click();
-
+	
 	          // At this point, we navigate away from an Angular page, so we need
 	          // to use browser.driver to get the base webdriver.
 	          browser.wait(function() {
@@ -10906,19 +10930,19 @@
 	        it('should initialize to model', function() {
 	          var userType = element(by.binding('userType'));
 	          var valid = element(by.binding('myForm.input.$valid'));
-
+	
 	          expect(userType.getText()).toContain('guest');
 	          expect(valid.getText()).toContain('true');
 	        });
-
+	
 	        it('should be invalid if empty', function() {
 	          var userType = element(by.binding('userType'));
 	          var valid = element(by.binding('myForm.input.$valid'));
 	          var userInput = element(by.model('userType'));
-
+	
 	          userInput.clear();
 	          userInput.sendKeys('');
-
+	
 	          expect(userType.getText()).toEqual('userType =');
 	          expect(valid.getText()).toContain('false');
 	        });
@@ -11031,24 +11055,24 @@
 	          var text = element(by.binding('example.text'));
 	          var valid = element(by.binding('myForm.input.$valid'));
 	          var input = element(by.model('example.text'));
-
+	
 	          it('should initialize to model', function() {
 	            expect(text.getText()).toContain('guest');
 	            expect(valid.getText()).toContain('true');
 	          });
-
+	
 	          it('should be invalid if empty', function() {
 	            input.clear();
 	            input.sendKeys('');
-
+	
 	            expect(text.getText()).toEqual('text =');
 	            expect(valid.getText()).toContain('false');
 	          });
-
+	
 	          it('should be invalid if multi word', function() {
 	            input.clear();
 	            input.sendKeys('hello world');
-
+	
 	            expect(valid.getText()).toContain('false');
 	          });
 	        </file>
@@ -11123,7 +11147,7 @@
 	        var value = element(by.binding('example.value | date: "yyyy-MM-dd"'));
 	        var valid = element(by.binding('myForm.input.$valid'));
 	        var input = element(by.model('example.value'));
-
+	
 	        // currently protractor/webdriver does not support
 	        // sending keys to all known HTML5 input controls
 	        // for various browsers (see https://github.com/angular/protractor/issues/562).
@@ -11134,18 +11158,18 @@
 	          "angular.element(ipt).scope().$apply(function(s) { s.myForm[ipt.name].$setViewValue('" + val + "'); });";
 	          browser.executeScript(scr);
 	        }
-
+	
 	        it('should initialize to model', function() {
 	          expect(value.getText()).toContain('2013-10-22');
 	          expect(valid.getText()).toContain('myForm.input.$valid = true');
 	        });
-
+	
 	        it('should be invalid if empty', function() {
 	          setInput('');
 	          expect(value.getText()).toEqual('value =');
 	          expect(valid.getText()).toContain('myForm.input.$valid = false');
 	        });
-
+	
 	        it('should be invalid if over max', function() {
 	          setInput('2015-01-01');
 	          expect(value.getText()).toContain('');
@@ -11221,7 +11245,7 @@
 	      var value = element(by.binding('example.value | date: "yyyy-MM-ddTHH:mm:ss"'));
 	      var valid = element(by.binding('myForm.input.$valid'));
 	      var input = element(by.model('example.value'));
-
+	
 	      // currently protractor/webdriver does not support
 	      // sending keys to all known HTML5 input controls
 	      // for various browsers (https://github.com/angular/protractor/issues/562).
@@ -11232,18 +11256,18 @@
 	        "angular.element(ipt).scope().$apply(function(s) { s.myForm[ipt.name].$setViewValue('" + val + "'); });";
 	        browser.executeScript(scr);
 	      }
-
+	
 	      it('should initialize to model', function() {
 	        expect(value.getText()).toContain('2010-12-28T14:57:00');
 	        expect(valid.getText()).toContain('myForm.input.$valid = true');
 	      });
-
+	
 	      it('should be invalid if empty', function() {
 	        setInput('');
 	        expect(value.getText()).toEqual('value =');
 	        expect(valid.getText()).toContain('myForm.input.$valid = false');
 	      });
-
+	
 	      it('should be invalid if over max', function() {
 	        setInput('2015-01-01T23:59:00');
 	        expect(value.getText()).toContain('');
@@ -11320,7 +11344,7 @@
 	      var value = element(by.binding('example.value | date: "HH:mm:ss"'));
 	      var valid = element(by.binding('myForm.input.$valid'));
 	      var input = element(by.model('example.value'));
-
+	
 	      // currently protractor/webdriver does not support
 	      // sending keys to all known HTML5 input controls
 	      // for various browsers (https://github.com/angular/protractor/issues/562).
@@ -11331,18 +11355,18 @@
 	        "angular.element(ipt).scope().$apply(function(s) { s.myForm[ipt.name].$setViewValue('" + val + "'); });";
 	        browser.executeScript(scr);
 	      }
-
+	
 	      it('should initialize to model', function() {
 	        expect(value.getText()).toContain('14:57:00');
 	        expect(valid.getText()).toContain('myForm.input.$valid = true');
 	      });
-
+	
 	      it('should be invalid if empty', function() {
 	        setInput('');
 	        expect(value.getText()).toEqual('value =');
 	        expect(valid.getText()).toContain('myForm.input.$valid = false');
 	      });
-
+	
 	      it('should be invalid if over max', function() {
 	        setInput('23:59:00');
 	        expect(value.getText()).toContain('');
@@ -11420,7 +11444,7 @@
 	      var value = element(by.binding('example.value | date: "yyyy-Www"'));
 	      var valid = element(by.binding('myForm.input.$valid'));
 	      var input = element(by.model('example.value'));
-
+	
 	      // currently protractor/webdriver does not support
 	      // sending keys to all known HTML5 input controls
 	      // for various browsers (https://github.com/angular/protractor/issues/562).
@@ -11431,18 +11455,18 @@
 	        "angular.element(ipt).scope().$apply(function(s) { s.myForm[ipt.name].$setViewValue('" + val + "'); });";
 	        browser.executeScript(scr);
 	      }
-
+	
 	      it('should initialize to model', function() {
 	        expect(value.getText()).toContain('2013-W01');
 	        expect(valid.getText()).toContain('myForm.input.$valid = true');
 	      });
-
+	
 	      it('should be invalid if empty', function() {
 	        setInput('');
 	        expect(value.getText()).toEqual('value =');
 	        expect(valid.getText()).toContain('myForm.input.$valid = false');
 	      });
-
+	
 	      it('should be invalid if over max', function() {
 	        setInput('2015-W01');
 	        expect(value.getText()).toContain('');
@@ -11481,7 +11505,7 @@
 	   *   the `ngMin` expression evaluates to. Note that it does not set the `min` attribute.
 	   * @param {(date|string)=} ngMax Sets the `max` validation constraint to the Date / ISO week string
 	   *   the `ngMax` expression evaluates to. Note that it does not set the `max` attribute.
-
+	
 	   * @param {string=} required Sets `required` validation error key if the value is not entered.
 	   * @param {string=} ngRequired Adds `required` attribute and `required` validation constraint to
 	   *    the element when the ngRequired expression evaluates to true. Use `ngRequired` instead of
@@ -11521,7 +11545,7 @@
 	      var value = element(by.binding('example.value | date: "yyyy-MM"'));
 	      var valid = element(by.binding('myForm.input.$valid'));
 	      var input = element(by.model('example.value'));
-
+	
 	      // currently protractor/webdriver does not support
 	      // sending keys to all known HTML5 input controls
 	      // for various browsers (https://github.com/angular/protractor/issues/562).
@@ -11532,18 +11556,18 @@
 	        "angular.element(ipt).scope().$apply(function(s) { s.myForm[ipt.name].$setViewValue('" + val + "'); });";
 	        browser.executeScript(scr);
 	      }
-
+	
 	      it('should initialize to model', function() {
 	        expect(value.getText()).toContain('2013-10');
 	        expect(valid.getText()).toContain('myForm.input.$valid = true');
 	      });
-
+	
 	      it('should be invalid if empty', function() {
 	        setInput('');
 	        expect(value.getText()).toEqual('value =');
 	        expect(valid.getText()).toContain('myForm.input.$valid = false');
 	      });
-
+	
 	      it('should be invalid if over max', function() {
 	        setInput('2015-01');
 	        expect(value.getText()).toContain('');
@@ -11636,19 +11660,19 @@
 	          var value = element(by.binding('example.value'));
 	          var valid = element(by.binding('myForm.input.$valid'));
 	          var input = element(by.model('example.value'));
-
+	
 	          it('should initialize to model', function() {
 	            expect(value.getText()).toContain('12');
 	            expect(valid.getText()).toContain('true');
 	          });
-
+	
 	          it('should be invalid if empty', function() {
 	            input.clear();
 	            input.sendKeys('');
 	            expect(value.getText()).toEqual('value =');
 	            expect(valid.getText()).toContain('false');
 	          });
-
+	
 	          it('should be invalid if over max', function() {
 	            input.clear();
 	            input.sendKeys('123');
@@ -11730,24 +11754,24 @@
 	          var text = element(by.binding('url.text'));
 	          var valid = element(by.binding('myForm.input.$valid'));
 	          var input = element(by.model('url.text'));
-
+	
 	          it('should initialize to model', function() {
 	            expect(text.getText()).toContain('http://google.com');
 	            expect(valid.getText()).toContain('true');
 	          });
-
+	
 	          it('should be invalid if empty', function() {
 	            input.clear();
 	            input.sendKeys('');
-
+	
 	            expect(text.getText()).toEqual('text =');
 	            expect(valid.getText()).toContain('false');
 	          });
-
+	
 	          it('should be invalid if not url', function() {
 	            input.clear();
 	            input.sendKeys('box');
-
+	
 	            expect(valid.getText()).toContain('false');
 	          });
 	        </file>
@@ -11825,23 +11849,23 @@
 	          var text = element(by.binding('email.text'));
 	          var valid = element(by.binding('myForm.input.$valid'));
 	          var input = element(by.model('email.text'));
-
+	
 	          it('should initialize to model', function() {
 	            expect(text.getText()).toContain('me@example.com');
 	            expect(valid.getText()).toContain('true');
 	          });
-
+	
 	          it('should be invalid if empty', function() {
 	            input.clear();
 	            input.sendKeys('');
 	            expect(text.getText()).toEqual('text =');
 	            expect(valid.getText()).toContain('false');
 	          });
-
+	
 	          it('should be invalid if not email', function() {
 	            input.clear();
 	            input.sendKeys('xxx');
-
+	
 	            expect(valid.getText()).toContain('false');
 	          });
 	        </file>
@@ -11899,11 +11923,11 @@
 	        <file name="protractor.js" type="protractor">
 	          it('should change state', function() {
 	            var color = element(by.binding('color.name'));
-
+	
 	            expect(color.getText()).toContain('blue');
-
+	
 	            element.all(by.model('color.name')).get(0).click();
-
+	
 	            expect(color.getText()).toContain('red');
 	          });
 	        </file>
@@ -11950,13 +11974,13 @@
 	          it('should change state', function() {
 	            var value1 = element(by.binding('checkboxModel.value1'));
 	            var value2 = element(by.binding('checkboxModel.value2'));
-
+	
 	            expect(value1.getText()).toContain('true');
 	            expect(value2.getText()).toContain('YES');
-
+	
 	            element(by.model('checkboxModel.value1')).click();
 	            element(by.model('checkboxModel.value2')).click();
-
+	
 	            expect(value1.getText()).toContain('false');
 	            expect(value2.getText()).toContain('NO');
 	          });
@@ -12123,45 +12147,45 @@
 	        var formValid = element(by.binding('myForm.$valid'));
 	        var userNameInput = element(by.model('user.name'));
 	        var userLastInput = element(by.model('user.last'));
-
+	
 	        it('should initialize to model', function() {
 	          expect(user.getText()).toContain('{"name":"guest","last":"visitor"}');
 	          expect(userNameValid.getText()).toContain('true');
 	          expect(formValid.getText()).toContain('true');
 	        });
-
+	
 	        it('should be invalid if empty when required', function() {
 	          userNameInput.clear();
 	          userNameInput.sendKeys('');
-
+	
 	          expect(user.getText()).toContain('{"last":"visitor"}');
 	          expect(userNameValid.getText()).toContain('false');
 	          expect(formValid.getText()).toContain('false');
 	        });
-
+	
 	        it('should be valid if empty when min length is set', function() {
 	          userLastInput.clear();
 	          userLastInput.sendKeys('');
-
+	
 	          expect(user.getText()).toContain('{"name":"guest","last":""}');
 	          expect(lastNameValid.getText()).toContain('true');
 	          expect(formValid.getText()).toContain('true');
 	        });
-
+	
 	        it('should be invalid if less than required min length', function() {
 	          userLastInput.clear();
 	          userLastInput.sendKeys('xx');
-
+	
 	          expect(user.getText()).toContain('{"name":"guest"}');
 	          expect(lastNameValid.getText()).toContain('false');
 	          expect(lastNameError.getText()).toContain('minlength');
 	          expect(formValid.getText()).toContain('false');
 	        });
-
+	
 	        it('should be invalid if longer than max length', function() {
 	          userLastInput.clear();
 	          userLastInput.sendKeys('some ridiculously long name');
-
+	
 	          expect(user.getText()).toContain('{"name":"guest"}');
 	          expect(lastNameValid.getText()).toContain('false');
 	          expect(lastNameError.getText()).toContain('maxlength');
@@ -12215,7 +12239,7 @@
 	      </file>
 	      <file name="protractor.js" type="protractor">
 	        var favorite = element(by.binding('my.favorite'));
-
+	
 	        it('should initialize to model', function() {
 	          expect(favorite.getText()).toContain('unicorns');
 	        });
@@ -12267,7 +12291,7 @@
 	     <file name="protractor.js" type="protractor">
 	       it('should check ng-bind', function() {
 	         var nameInput = element(by.model('name'));
-
+	
 	         expect(element(by.binding('name')).getText()).toBe('Whirled');
 	         nameInput.clear();
 	         nameInput.sendKeys('world');
@@ -12313,14 +12337,14 @@
 	         var salutationElem = element(by.binding('salutation'));
 	         var salutationInput = element(by.model('salutation'));
 	         var nameInput = element(by.model('name'));
-
+	
 	         expect(salutationElem.getText()).toBe('Hello World!');
-
+	
 	         salutationInput.clear();
 	         salutationInput.sendKeys('Greetings');
 	         nameInput.clear();
 	         nameInput.sendKeys('user');
-
+	
 	         expect(salutationElem.getText()).toBe('Greetings user!');
 	       });
 	     </file>
@@ -12347,14 +12371,14 @@
 	 * @param {expression} ngBindHtml {@link guide/expression Expression} to evaluate.
 	 *
 	 * @example
-
+	
 	   <example module="bindHtmlExample" deps="angular-sanitize.js">
 	     <file name="index.html">
 	       <div ng-controller="ExampleController">
 	        <p ng-bind-html="myHTML"></p>
 	       </div>
 	     </file>
-
+	
 	     <file name="script.js">
 	       angular.module('bindHtmlExample', ['ngSanitize'])
 	         .controller('ExampleController', ['$scope', function($scope) {
@@ -12363,7 +12387,7 @@
 	              '<a href="#">links!</a> and other <em>stuff</em>';
 	         }]);
 	     </file>
-
+	
 	     <file name="protractor.js" type="protractor">
 	       it('should check ng-bind-html', function() {
 	         expect(element(by.binding('myHTML')).getText()).toBe(
@@ -12433,7 +12457,7 @@
 	 *
 	 *     it('should not evaluate the expression if changing from model', function() {
 	 *       element(by.id('ng-change-example2')).click();
-
+	
 	 *       expect(counter.getText()).toContain('0');
 	 *       expect(debug.getText()).toContain('true');
 	 *     });
@@ -12543,26 +12567,26 @@
 	     </file>
 	     <file name="protractor.js" type="protractor">
 	       var ps = element.all(by.css('p'));
-
+	
 	       it('should let you toggle the class', function() {
-
+	
 	         expect(ps.first().getAttribute('class')).not.toMatch(/bold/);
 	         expect(ps.first().getAttribute('class')).not.toMatch(/has-error/);
-
+	
 	         element(by.model('important')).click();
 	         expect(ps.first().getAttribute('class')).toMatch(/bold/);
-
+	
 	         element(by.model('error')).click();
 	         expect(ps.first().getAttribute('class')).toMatch(/has-error/);
 	       });
-
+	
 	       it('should let you toggle string example', function() {
 	         expect(ps.get(1).getAttribute('class')).toBe('');
 	         element(by.model('style')).clear();
 	         element(by.model('style')).sendKeys('red');
 	         expect(ps.get(1).getAttribute('class')).toBe('red');
 	       });
-
+	
 	       it('array example should have 3 classes', function() {
 	         expect(ps.get(2).getAttribute('class')).toBe('');
 	         element(by.model('style1')).sendKeys('bold');
@@ -12570,7 +12594,7 @@
 	         element(by.model('style3')).sendKeys('red');
 	         expect(ps.get(2).getAttribute('class')).toBe('bold strike red');
 	       });
-
+	
 	       it('array with map example should have 2 classes', function() {
 	         expect(ps.last().getAttribute('class')).toBe('');
 	         element(by.model('style4')).sendKeys('bold');
@@ -12579,11 +12603,11 @@
 	       });
 	     </file>
 	   </example>
-
+	
 	   ## Animations
-
+	
 	   The example below demonstrates how to perform animations using ngClass.
-
+	
 	   <example module="ngAnimate" deps="angular-animate.js" animations="true">
 	     <file name="index.html">
 	      <input id="setbtn" type="button" value="set" ng-click="myVar='my-class'">
@@ -12595,7 +12619,7 @@
 	       .base-class {
 	         transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	       }
-
+	
 	       .base-class.my-class {
 	         color: red;
 	         font-size:3em;
@@ -12605,21 +12629,21 @@
 	       it('should check ng-class', function() {
 	         expect(element(by.css('.base-class')).getAttribute('class')).not.
 	           toMatch(/my-class/);
-
+	
 	         element(by.id('setbtn')).click();
-
+	
 	         expect(element(by.css('.base-class')).getAttribute('class')).
 	           toMatch(/my-class/);
-
+	
 	         element(by.id('clearbtn')).click();
-
+	
 	         expect(element(by.css('.base-class')).getAttribute('class')).not.
 	           toMatch(/my-class/);
 	       });
 	     </file>
 	   </example>
-
-
+	
+	
 	   ## ngClass and pre-existing CSS3 Transitions/Animations
 	   The ngClass directive still supports CSS3 Transitions/Animations even if they do not follow the ngAnimate CSS naming structure.
 	   Upon animation ngAnimate will apply supplementary CSS classes to track the start and end of an animation, but this will not hinder
@@ -12991,7 +13015,7 @@
 	 *    });
 	 *  </file>
 	 *</example>
-
+	
 	 */var ngControllerDirective=[function(){return{restrict:'A',scope:true,controller:'@',priority:500};}];/**
 	 * @ngdoc directive
 	 * @name ngCsp
@@ -13083,7 +13107,7 @@
 	                {{ctrl.counter}}
 	              </span>
 	            </div>
-
+	
 	            <div>
 	              <button ng-click="ctrl.evil()" id="evil">Evil</button>
 	              <span id="evilError">
@@ -13111,12 +13135,12 @@
 	        </file>
 	        <file name="protractor.js" type="protractor">
 	          var util, webdriver;
-
+	
 	          var incBtn = element(by.id('inc'));
 	          var counter = element(by.id('counter'));
 	          var evilBtn = element(by.id('evil'));
 	          var evilError = element(by.id('evilError'));
-
+	
 	          function getAndClearSevereErrors() {
 	            return browser.manage().logs().get('browser').then(function(browserLog) {
 	              return browserLog.filter(function(logEntry) {
@@ -13124,11 +13148,11 @@
 	              });
 	            });
 	          }
-
+	
 	          function clearErrors() {
 	            getAndClearSevereErrors();
 	          }
-
+	
 	          function expectNoErrors() {
 	            getAndClearSevereErrors().then(function(filteredLog) {
 	              expect(filteredLog.length).toEqual(0);
@@ -13137,7 +13161,7 @@
 	              }
 	            });
 	          }
-
+	
 	          function expectError(regex) {
 	            getAndClearSevereErrors().then(function(filteredLog) {
 	              var found = false;
@@ -13151,19 +13175,19 @@
 	              }
 	            });
 	          }
-
+	
 	          beforeEach(function() {
 	            util = require('util');
 	            webdriver = require('protractor/node_modules/selenium-webdriver');
 	          });
-
+	
 	          // For now, we only test on Chrome,
 	          // as Safari does not load the page with Protractor's injected scripts,
 	          // and Firefox webdriver always disables content security policy (#6358)
 	          if (browser.params.browser !== 'chrome') {
 	            return;
 	          }
-
+	
 	          it('should not report errors when the page is loaded', function() {
 	            // clear errors so we are not dependent on previous tests
 	            clearErrors();
@@ -13174,14 +13198,14 @@
 	            });
 	            expectNoErrors();
 	          });
-
+	
 	          it('should evaluate expressions', function() {
 	            expect(counter.getText()).toEqual('0');
 	            incBtn.click();
 	            expect(counter.getText()).toEqual('1');
 	            expectNoErrors();
 	          });
-
+	
 	          it('should throw and report an error when using "eval"', function() {
 	            evilBtn.click();
 	            expect(evilError.getText()).toMatch(/Content Security Policy/);
@@ -13416,7 +13440,7 @@
 	     <file name="index.html">
 	       <p>Typing in the input box below updates the key count</p>
 	       <input ng-keyup="count = count + 1" ng-init="count=0"> key up count: {{count}}
-
+	
 	       <p>Typing in the input box below updates the keycode</p>
 	       <input ng-keyup="event=$event">
 	       <p>event keyCode: {{ event.keyCode }}</p>
@@ -13661,16 +13685,16 @@
 	        border:1px solid black;
 	        padding:10px;
 	      }
-
+	
 	      .animate-if.ng-enter, .animate-if.ng-leave {
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
 	      }
-
+	
 	      .animate-if.ng-enter,
 	      .animate-if.ng-leave.ng-leave-active {
 	        opacity:0;
 	      }
-
+	
 	      .animate-if.ng-leave,
 	      .animate-if.ng-enter.ng-enter-active {
 	        opacity:1;
@@ -13767,14 +13791,14 @@
 	        height:40px;
 	        overflow:hidden;
 	      }
-
+	
 	      .slide-animate {
 	        padding:10px;
 	      }
-
+	
 	      .slide-animate.ng-enter, .slide-animate.ng-leave {
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-
+	
 	        position:absolute;
 	        top:0;
 	        left:0;
@@ -13783,14 +13807,14 @@
 	        display:block;
 	        padding:10px;
 	      }
-
+	
 	      .slide-animate.ng-enter {
 	        top:-50px;
 	      }
 	      .slide-animate.ng-enter.ng-enter-active {
 	        top:0;
 	      }
-
+	
 	      .slide-animate.ng-leave {
 	        top:0;
 	      }
@@ -13801,11 +13825,11 @@
 	    <file name="protractor.js" type="protractor">
 	      var templateSelect = element(by.model('template'));
 	      var includeElem = element(by.css('[ng-include]'));
-
+	
 	      it('should load template1.html', function() {
 	        expect(includeElem.getText()).toMatch(/Content of template1.html/);
 	      });
-
+	
 	      it('should load template2.html', function() {
 	        if (browser.params.browser == 'firefox') {
 	          // Firefox can't handle using selects
@@ -13816,7 +13840,7 @@
 	        templateSelect.all(by.css('option')).get(2).click();
 	        expect(includeElem.getText()).toMatch(/Content of template2.html/);
 	      });
-
+	
 	      it('should change to blank', function() {
 	        if (browser.params.browser == 'firefox') {
 	          // Firefox can't handle using selects
@@ -14033,15 +14057,15 @@
 	       the control reads value from the DOM. The functions are called in array order, each passing
 	       its return value through to the next. The last return value is forwarded to the
 	       {@link ngModel.NgModelController#$validators `$validators`} collection.
-
+	
 	Parsers are used to sanitize / convert the {@link ngModel.NgModelController#$viewValue
 	`$viewValue`}.
-
+	
 	Returning `undefined` from a parser means a parse error occurred. In that case,
 	no {@link ngModel.NgModelController#$validators `$validators`} will run and the `ngModel`
 	will be set to `undefined` unless {@link ngModelOptions `ngModelOptions.allowInvalid`}
 	is set to `true`. The parse error is stored in `ngModel.$error.parse`.
-
+	
 	 *
 	 * @property {Array.<Function>} $formatters Array of functions to execute, as a pipeline, whenever
 	       the model value changes. The functions are called in reverse array order, each passing the value through to the
@@ -14148,11 +14172,11 @@
 	        background-color: white;
 	        min-height: 20px;
 	      }
-
+	
 	      .ng-invalid {
 	        border: 1px solid red;
 	      }
-
+	
 	    </file>
 	    <file name="script.js">
 	      angular.module('customControl', ['ngSanitize']).
@@ -14162,18 +14186,18 @@
 	            require: '?ngModel', // get a hold of NgModelController
 	            link: function(scope, element, attrs, ngModel) {
 	              if (!ngModel) return; // do nothing if no ng-model
-
+	
 	              // Specify how UI should be updated
 	              ngModel.$render = function() {
 	                element.html($sce.getTrustedHtml(ngModel.$viewValue || ''));
 	              };
-
+	
 	              // Listen for change events to enable binding
 	              element.on('blur keyup change', function() {
 	                scope.$evalAsync(read);
 	              });
 	              read(); // initialize
-
+	
 	              // Write data to the model
 	              function read() {
 	                var html = element.html();
@@ -14208,9 +14232,9 @@
 	      }
 	      var contentEditable = element(by.css('[contenteditable]'));
 	      var content = 'Change me!';
-
+	
 	      expect(contentEditable.getText()).toEqual(content);
-
+	
 	      contentEditable.clear();
 	      contentEditable.sendKeys(protractor.Key.BACK_SPACE);
 	      expect(contentEditable.getText()).toEqual('');
@@ -14406,7 +14430,7 @@
 	          div:nth-child(1) {
 	            padding-right: 30px;
 	          }
-
+	
 	        </file>
 	   * </example>
 	   */this.$rollbackViewValue=function(){$timeout.cancel(pendingDebounce);ctrl.$viewValue=ctrl.$$lastCommittedViewValue;ctrl.$render();};/**
@@ -14749,11 +14773,11 @@
 	 *     If not specified, the timezone of the browser will be used.
 	 *
 	 * @example
-
+	
 	  The following example shows how to override immediate updates. Changes on the inputs within the
 	  form will update the model only when the control loses focus (blur event). If `escape` key is
 	  pressed while the input field is focused, the value is reset to the value in the current model.
-
+	
 	  <example name="ngModelOptions-directive-blur" module="optionsExample">
 	    <file name="index.html">
 	      <div ng-controller="ExampleController">
@@ -14776,7 +14800,7 @@
 	      angular.module('optionsExample', [])
 	        .controller('ExampleController', ['$scope', function($scope) {
 	          $scope.user = { name: 'John', data: '' };
-
+	
 	          $scope.cancel = function(e) {
 	            if (e.keyCode == 27) {
 	              $scope.userForm.userName.$rollbackViewValue();
@@ -14788,7 +14812,7 @@
 	      var model = element(by.binding('user.name'));
 	      var input = element(by.model('user.name'));
 	      var other = element(by.model('user.data'));
-
+	
 	      it('should allow custom events', function() {
 	        input.sendKeys(' Doe');
 	        input.click();
@@ -14796,7 +14820,7 @@
 	        other.click();
 	        expect(model.getText()).toEqual('John Doe');
 	      });
-
+	
 	      it('should $rollbackViewValue when model changes', function() {
 	        input.sendKeys(' Doe');
 	        expect(input.getAttribute('value')).toEqual('John Doe');
@@ -14807,10 +14831,10 @@
 	      });
 	    </file>
 	  </example>
-
+	
 	  This one shows how to debounce model changes. Model will be updated only 1 sec after last change.
 	  If the `Clear` button is pressed, any debounced action is canceled and the value becomes empty.
-
+	
 	  <example name="ngModelOptions-directive-debounce" module="optionsExample">
 	    <file name="index.html">
 	      <div ng-controller="ExampleController">
@@ -14833,9 +14857,9 @@
 	        }]);
 	    </file>
 	  </example>
-
+	
 	  This one shows how to bind to getter/setters:
-
+	
 	  <example name="ngModelOptions-directive-getter-setter" module="getterSetterExample">
 	    <file name="index.html">
 	      <div ng-controller="ExampleController">
@@ -15092,20 +15116,20 @@
 	              <option value="">-- choose color --</option>
 	            </select>
 	          </span></label><br/>
-
+	
 	          <label>Color grouped by shade:
 	            <select ng-model="myColor" ng-options="color.name group by color.shade for color in colors">
 	            </select>
 	          </label><br/>
-
+	
 	          <label>Color grouped by shade, with some disabled:
 	            <select ng-model="myColor"
 	                  ng-options="color.name group by color.shade disable when color.notAnOption for color in colors">
 	            </select>
 	          </label><br/>
-
-
-
+	
+	
+	
 	          Select <button ng-click="myColor = { name:'not in list', shade: 'other' }">bogus</button>.
 	          <br/>
 	          <hr/>
@@ -15312,7 +15336,7 @@
 	          <label>Person 1:<input type="text" ng-model="person1" value="Igor" /></label><br/>
 	          <label>Person 2:<input type="text" ng-model="person2" value="Misko" /></label><br/>
 	          <label>Number of People:<input type="text" ng-model="personCount" value="1" /></label><br/>
-
+	
 	          <!--- Example with simple pluralization rules for en locale --->
 	          Without Offset:
 	          <ng-pluralize count="personCount"
@@ -15320,7 +15344,7 @@
 	                               'one': '1 person is viewing.',
 	                               'other': '{} people are viewing.'}">
 	          </ng-pluralize><br>
-
+	
 	          <!--- Example with offset --->
 	          With Offset(2):
 	          <ng-pluralize count="personCount" offset=2
@@ -15337,31 +15361,31 @@
 	          var withoutOffset = element.all(by.css('ng-pluralize')).get(0);
 	          var withOffset = element.all(by.css('ng-pluralize')).get(1);
 	          var countInput = element(by.model('personCount'));
-
+	
 	          expect(withoutOffset.getText()).toEqual('1 person is viewing.');
 	          expect(withOffset.getText()).toEqual('Igor is viewing.');
-
+	
 	          countInput.clear();
 	          countInput.sendKeys('0');
-
+	
 	          expect(withoutOffset.getText()).toEqual('Nobody is viewing.');
 	          expect(withOffset.getText()).toEqual('Nobody is viewing.');
-
+	
 	          countInput.clear();
 	          countInput.sendKeys('2');
-
+	
 	          expect(withoutOffset.getText()).toEqual('2 people are viewing.');
 	          expect(withOffset.getText()).toEqual('Igor and Misko are viewing.');
-
+	
 	          countInput.clear();
 	          countInput.sendKeys('3');
-
+	
 	          expect(withoutOffset.getText()).toEqual('3 people are viewing.');
 	          expect(withOffset.getText()).toEqual('Igor, Misko and one other person are viewing.');
-
+	
 	          countInput.clear();
 	          countInput.sendKeys('4');
-
+	
 	          expect(withoutOffset.getText()).toEqual('4 people are viewing.');
 	          expect(withOffset.getText()).toEqual('Igor, Misko and 2 other people are viewing.');
 	        });
@@ -15656,26 +15680,26 @@
 	        margin:0;
 	        padding:0 10px;
 	      }
-
+	
 	      .animate-repeat {
 	        line-height:30px;
 	        list-style:none;
 	        box-sizing:border-box;
 	      }
-
+	
 	      .animate-repeat.ng-move,
 	      .animate-repeat.ng-enter,
 	      .animate-repeat.ng-leave {
 	        transition:all linear 0.5s;
 	      }
-
+	
 	      .animate-repeat.ng-leave.ng-leave-active,
 	      .animate-repeat.ng-move,
 	      .animate-repeat.ng-enter {
 	        opacity:0;
 	        max-height:0;
 	      }
-
+	
 	      .animate-repeat.ng-leave,
 	      .animate-repeat.ng-move.ng-move-active,
 	      .animate-repeat.ng-enter.ng-enter-active {
@@ -15685,7 +15709,7 @@
 	    </file>
 	    <file name="protractor.js" type="protractor">
 	      var friends = element.all(by.repeater('friend in friends'));
-
+	
 	      it('should render initial data set', function() {
 	        expect(friends.count()).toBe(10);
 	        expect(friends.get(0).getText()).toEqual('[1] John who is 25 years old.');
@@ -15694,12 +15718,12 @@
 	        expect(element(by.binding('friends.length')).getText())
 	            .toMatch("I have 10 friends. They are:");
 	      });
-
+	
 	       it('should update repeater when filter predicate changes', function() {
 	         expect(friends.count()).toBe(10);
-
+	
 	         element(by.model('q')).sendKeys('ma');
-
+	
 	         expect(friends.count()).toBe(2);
 	         expect(friends.get(0).getText()).toEqual('[1] Mary who is 28 years old.');
 	         expect(friends.last().getText()).toEqual('[2] Samantha who is 60 years old.');
@@ -15867,17 +15891,17 @@
 	        border: 1px solid black;
 	        background: white;
 	      }
-
+	
 	      .animate-show.ng-hide-add, .animate-show.ng-hide-remove {
 	        transition: all linear 0.5s;
 	      }
-
+	
 	      .animate-show.ng-hide {
 	        line-height: 0;
 	        opacity: 0;
 	        padding: 0 10px;
 	      }
-
+	
 	      .check-element {
 	        padding: 10px;
 	        border: 1px solid black;
@@ -15887,13 +15911,13 @@
 	    <file name="protractor.js" type="protractor">
 	      var thumbsUp = element(by.css('span.glyphicon-thumbs-up'));
 	      var thumbsDown = element(by.css('span.glyphicon-thumbs-down'));
-
+	
 	      it('should check ng-show / ng-hide', function() {
 	        expect(thumbsUp.isDisplayed()).toBeFalsy();
 	        expect(thumbsDown.isDisplayed()).toBeTruthy();
-
+	
 	        element(by.model('checked')).click();
-
+	
 	        expect(thumbsUp.isDisplayed()).toBeTruthy();
 	        expect(thumbsDown.isDisplayed()).toBeFalsy();
 	      });
@@ -16019,13 +16043,13 @@
 	        border: 1px solid black;
 	        background: white;
 	      }
-
+	
 	      .animate-hide.ng-hide {
 	        line-height: 0;
 	        opacity: 0;
 	        padding: 0 10px;
 	      }
-
+	
 	      .check-element {
 	        padding: 10px;
 	        border: 1px solid black;
@@ -16035,13 +16059,13 @@
 	    <file name="protractor.js" type="protractor">
 	      var thumbsUp = element(by.css('span.glyphicon-thumbs-up'));
 	      var thumbsDown = element(by.css('span.glyphicon-thumbs-down'));
-
+	
 	      it('should check ng-show / ng-hide', function() {
 	        expect(thumbsUp.isDisplayed()).toBeFalsy();
 	        expect(thumbsDown.isDisplayed()).toBeTruthy();
-
+	
 	        element(by.model('checked')).click();
-
+	
 	        expect(thumbsUp.isDisplayed()).toBeTruthy();
 	        expect(thumbsDown.isDisplayed()).toBeFalsy();
 	      });
@@ -16089,7 +16113,7 @@
 	     </file>
 	     <file name="protractor.js" type="protractor">
 	       var colorSpan = element(by.css('span'));
-
+	
 	       it('should check ng-style', function() {
 	         expect(colorSpan.getCssValue('color')).toBe('rgba(0, 0, 0, 1)');
 	         element(by.css('input[value=\'set color\']')).click();
@@ -16124,7 +16148,7 @@
 	 * For example, **`ng-switch-when="someVal"`** will match against the string `"someVal"` not against the
 	 * value of the expression `$scope.someVal`.
 	 * </div>
-
+	
 	 * @animations
 	 * | Animation                        | Occurs                              |
 	 * |----------------------------------|-------------------------------------|
@@ -16186,21 +16210,21 @@
 	        height:40px;
 	        overflow:hidden;
 	      }
-
+	
 	      .animate-switch {
 	        padding:10px;
 	      }
-
+	
 	      .animate-switch.ng-animate {
 	        transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
-
+	
 	        position:absolute;
 	        top:0;
 	        left:0;
 	        right:0;
 	        bottom:0;
 	      }
-
+	
 	      .animate-switch.ng-leave.ng-leave-active,
 	      .animate-switch.ng-enter {
 	        top:-50px;
@@ -16213,7 +16237,7 @@
 	    <file name="protractor.js" type="protractor">
 	      var switchElem = element(by.css('[ng-switch]'));
 	      var select = element(by.model('selection'));
-
+	
 	      it('should start in settings', function() {
 	        expect(switchElem.getText()).toMatch(/Settings Div/);
 	      });
@@ -16414,7 +16438,7 @@
 	      <script type="text/ng-template" id="/tpl.html">
 	        Content of the template.
 	      </script>
-
+	
 	      <a ng-click="currentTpl='/tpl.html'" id="tpl-link">Load inlined template</a>
 	      <div id="tpl-content" ng-include src="currentTpl"></div>
 	    </file>
@@ -16735,10 +16759,10 @@
 	       var required = element(by.binding('form.input.$error.required'));
 	       var model = element(by.binding('model'));
 	       var input = element(by.id('input'));
-
+	
 	       it('should set the required error', function() {
 	         expect(required.getText()).toContain('true');
-
+	
 	         input.sendKeys('123');
 	         expect(required.getText()).not.toContain('true');
 	         expect(model.getText()).toContain('123');
@@ -16808,11 +16832,11 @@
 	 *   <file name="protractor.js" type="protractor">
 	       var model = element(by.binding('model'));
 	       var input = element(by.id('input'));
-
+	
 	       it('should validate the input with the default pattern', function() {
 	         input.sendKeys('aaa');
 	         expect(model.getText()).not.toContain('aaa');
-
+	
 	         input.clear().then(function() {
 	           input.sendKeys('123');
 	           expect(model.getText()).toContain('123');
@@ -16874,11 +16898,11 @@
 	 *   <file name="protractor.js" type="protractor">
 	       var model = element(by.binding('model'));
 	       var input = element(by.id('input'));
-
+	
 	       it('should validate the input with the default maxlength', function() {
 	         input.sendKeys('abcdef');
 	         expect(model.getText()).not.toContain('abcdef');
-
+	
 	         input.clear().then(function() {
 	           input.sendKeys('abcde');
 	           expect(model.getText()).toContain('abcde');
@@ -16939,11 +16963,11 @@
 	 *   <file name="protractor.js" type="protractor">
 	       var model = element(by.binding('model'));
 	       var input = element(by.id('input'));
-
+	
 	       it('should validate the input with the default minlength', function() {
 	         input.sendKeys('ab');
 	         expect(model.getText()).not.toContain('ab');
-
+	
 	         input.sendKeys('abc');
 	         expect(model.getText()).toContain('abc');
 	       });
@@ -18505,7 +18529,7 @@
 	     *   reload: true, inherit: false, notify: true
 	     * });
 	     * </pre>
-
+	
 	     * @returns {promise} A promise representing the state of the new transition. See
 	     * {@link ui.router.state.$state#methods_go $state.go}.
 	     */$state.reload=function reload(state){return $state.transitionTo($state.current,$stateParams,{reload:state||true,inherit:false,notify:true});};/**
@@ -19249,39 +19273,39 @@
 /***/ function(module, exports) {
 
 	'use strict';
-
+	
 	Object.defineProperty(exports, "__esModule", {
-	        value: true
+	    value: true
 	});
 	function drawBackground(canvas, ctx, width, height, color) {
-	        canvas.width = width;
-	        canvas.height = height;
-	        ctx.fillStyle = color;
-	        ctx.fillRect(0, 0, width, height);
+	    canvas.width = width;
+	    canvas.height = height;
+	    ctx.fillStyle = color;
+	    ctx.fillRect(0, 0, width, height);
 	}
-
+	
 	function drawPaddle1(ctx, x, y, color, width, height) {
-	        ctx.fillStyle = color;
-	        ctx.fillRect(x, y, width, height);
+	    ctx.fillStyle = color;
+	    ctx.fillRect(x, y, width, height);
 	}
-
+	
 	function drawPaddle2(ctx, x, y, color, width, height) {
-	        ctx.fillStyle = color;
-	        ctx.fillRect(x, y, width, height);
+	    ctx.fillStyle = color;
+	    ctx.fillRect(x, y, width, height);
 	}
-
+	
 	function drawBall(ctx, x, y, size) {
-	        ctx.beginPath();
-	        ctx.arc(x, y, size, 0, Math.PI * 2);
-	        ctx.fill();
+	    ctx.beginPath();
+	    ctx.arc(x, y, size, 0, Math.PI * 2);
+	    ctx.fill();
 	}
-
+	
 	function drawScores(ctx, p1, p2, canvasWidth) {
-	        ctx.font = '2rem arial';
-	        ctx.fillText(p1, canvasWidth / 4, 40);
-	        ctx.fillText(p2, canvasWidth - canvasWidth / 4, 40);
+	    ctx.font = '2rem arial';
+	    ctx.fillText(p1, canvasWidth / 4, 40);
+	    ctx.fillText(p2, canvasWidth - canvasWidth / 4, 40);
 	}
-
+	
 	exports.drawBackground = drawBackground;
 	exports.drawPaddle1 = drawPaddle1;
 	exports.drawPaddle2 = drawPaddle2;
@@ -19293,39 +19317,39 @@
 /***/ function(module, exports) {
 
 	"use strict";
-
+	
 	var canvasWidth = window.innerWidth;
 	var canvasHeight = window.innerHeight;
-
+	
 	var centerX = canvasWidth / 2;
 	var centerY = canvasHeight / 2;
-
+	
 	var paddleWidth = window.innerWidth / 40;
 	var paddleHeight = window.innerHeight / 5;
-
+	
 	var paddle1Y = (canvasHeight - paddleHeight) / 2;
 	var paddle2Y = (canvasHeight - paddleHeight) / 2;
-
+	
 	var ballSize = 12;
-
+	
 	var ballSpeedX = 8;
 	var ballSpeedY = 12;
-
+	
 	var originalSpeedX = 8;
 	var originalSpeedY = 12;
-
+	
 	var ballX = canvasWidth / 2;
 	var ballY = canvasHeight / 2;
-
+	
 	var speedConst = .25;
-
+	
 	var player1Score = 0;
 	var player2Score = 0;
 	var maxScore = 10;
-
+	
 	var ticking = true;
 	var frameRate = 20;
-
+	
 	module.exports = {
 	    centerX: centerX,
 	    centerY: centerY,
@@ -19349,5 +19373,96 @@
 	    frameRate: frameRate
 	};
 
+/***/ },
+/* 6 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * just namespace
+	 * @type {[type]}
+	 */
+	var just = just || {};
+	
+	/**
+	 * Random string generator
+	 *
+	 * can be used on node.js or client side
+	 *
+	 * type can be numbers, uppercases, lowercases or combination
+	 * of those separated with _
+	 *
+	 * examples:
+	 * var rs = randomstring(); // returns "ElZOtlOSLn49GeKLev2O"
+	 * var rs = randomstring(20, 'numbers'); // returns "78394850802905961074"
+	 * var rs = randomstring(15, 'numbers_uppercases'); // returns "PXL3AE2USI7ZDQ2"
+	 * 
+	 * @param  {int} len length of generated string
+	 * @param  {string} type type of charachters in string
+	 * @return {string}
+	 */
+	just.randomstring = function (len, type) {
+	
+	    len = len || 20;
+	    type = type || 'numbers_uppercases_lowercases';
+	
+	    var strings = {
+	        numbers: '0123456789',
+	        uppercases: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
+	        lowercases: 'abcdefghiklmnopqrstuvwxyz'
+	    },
+	        choise = '',
+	        ret = '',
+	        types = type.split('_'),
+	        i;
+	
+	    for (i = 0; i < types.length; i++) {
+	        if (strings[types[i]]) {
+	            choise += strings[types[i]];
+	        }
+	    }
+	
+	    if (!choise) {
+	        choise = strings.numbers + strings.lowercases + strings.uppercases;
+	    }
+	
+	    for (i = 0; i < len; i++) {
+	        ret += choise[Math.floor(Math.random() * choise.length)];
+	    }
+	
+	    return ret;
+	};
+	
+	/**
+	 * Return array of random strings
+	 *
+	 * first param is length of array, other params are the 
+	 * same as for randomstring(len, type)
+	 * 
+	 * @param  {int} arrayLen
+	 * @param  {int} len
+	 * @param  {string} type
+	 * @return {array}
+	 */
+	just.randomstring.array = function (arrayLen, len, type) {
+	
+	    arrayLen = arrayLen || 5;
+	
+	    var ret = [],
+	        i;
+	
+	    for (i = 0; i < arrayLen; i++) {
+	        ret.push(this(len, type));
+	    }
+	
+	    return ret;
+	};
+	
+	if (typeof module !== 'undefined' && module.exports) {
+	    module.exports = just.randomstring;
+	}
+
 /***/ }
 /******/ ]);
+//# sourceMappingURL=bundle.js.map

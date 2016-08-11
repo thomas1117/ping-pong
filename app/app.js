@@ -1,13 +1,26 @@
 import angular from 'angular';
 import uiRouter from 'angular-ui-router';
+var randomstring = require('just.randomstring');
 
 import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util/drawShapes.js';
 
 import * as variable from './util/constants.js';
 
-var {centerX,centerY,canvasWidth,canvasHeight,paddleWidth,paddleHeight,paddle1Y,paddle2Y,ballSize,
-    ballSpeedX,ballSpeedY,originalSpeedX,originalSpeedY,ballX,ballY,speedConst,player1Score,
-    player2Score,maxScore,frameRate} = variable;
+
+
+var {centerX,centerY,
+    canvasWidth,canvasHeight,
+    paddleWidth,paddleHeight,
+    paddle1Y,paddle2Y,
+    ballSize,
+    ballSpeedX,ballSpeedY,
+    originalSpeedX,originalSpeedY,
+    ballX,ballY,
+    speedConst,
+    player1Score,
+    player2Score,
+    maxScore,
+    frameRate} = variable;
 
 
 var myApp = angular.module('myApp',['ui.router']);
@@ -25,7 +38,7 @@ myApp.config(function($stateProvider, $urlRouterProvider){
          
         .state('game', {
         	url: '/game',
-            templateUrl: '../components/game.html',
+            templateUrl: './components/game.html',
             controller: 'game'
                   
         });
@@ -33,6 +46,12 @@ myApp.config(function($stateProvider, $urlRouterProvider){
 
 myApp.controller('main',function($scope){
     
+    $scope.generateGame = function(user) {
+          var group = randomstring();
+
+          console.log(group)
+    }
+
 });
 
 myApp.controller('game',function($scope,$window,$interval){
@@ -40,10 +59,13 @@ myApp.controller('game',function($scope,$window,$interval){
     var canvas = document.getElementById("pong");
     var ctx = canvas.getContext("2d");
 
-    $window.addEventListener('resize', resizeCanvas, false); 
+    var render = $interval(function(){ drawEverything() },frameRate);
+
+    $window.addEventListener('resize', drawEverything, false); 
+
     $scope.load = function() {render}
 
-    var render = $interval(function(){ drawEverything() },frameRate);
+    
 
 
     function drawEverything() {
@@ -60,9 +82,7 @@ myApp.controller('game',function($scope,$window,$interval){
         moveBall();         
     }
 
-    function resizeCanvas() {
-       drawEverything();     
-    }
+    
 
     
     function calculateMousePos(evt) {
@@ -70,7 +90,26 @@ myApp.controller('game',function($scope,$window,$interval){
        
     }
 
+
+
+    socket.on('connect',function(){
+    
+        socket.on("player1Move",function(resp){
+            paddle2Y = resp.position;
+        })
+
+    });
+
     canvas.addEventListener('mousemove',function(event){
+
+            //socket user check??
+
+            /*if(user1){
+                socket.emit("moveY",{position:paddle1Y})
+
+            else {socket.emit("moveY",{position:paddle2Y})}
+
+            }*/
             
             var mousePos = calculateMousePos(event);
 
@@ -84,6 +123,10 @@ myApp.controller('game',function($scope,$window,$interval){
 
                 paddle1Y = canvasHeight - paddleHeight;
             }  
+
+            socket.emit("moveY",{
+                position: paddle1Y
+            })
     });
 
     function resetGame(str){
@@ -94,14 +137,14 @@ myApp.controller('game',function($scope,$window,$interval){
 
         if(str==='goLeft') {
             
-            player1Score+=10;
+            player1Score+=1;
             
 
             ballSpeedX = -originalSpeedX;
             ballSpeedY = -originalSpeedY;
         }
         else {
-            player2Score+=10;
+            player2Score+=1;
 
 
             ballSpeedX = originalSpeedX;
