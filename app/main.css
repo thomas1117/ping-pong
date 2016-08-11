@@ -47,6 +47,7 @@ input {
 	display: block;
 	margin-bottom: 20px;
 	border:none;
+	font-size: 1.2em;
 
 }
 
@@ -56,5 +57,15 @@ button {
 	border:1px solid #f7f7f7;
 	padding:10px 15px 10px 15px;
 	background-color: #ddd;
+}
+
+.invalid::-webkit-input-placeholder { /* WebKit browsers */
+    color:    red;
+}
+.invalid::-moz-placeholder { /* WebKit browsers */
+    color:    red;
+}
+.invalid::-ms-input-placeholder { /* WebKit browsers */
+    color:    red;
 }
 

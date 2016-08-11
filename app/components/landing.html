@@ -3,10 +3,9 @@
 	<div class="wrap">
 			<div class="form-contain">
 				<h2>PONG</h2>
-				<form id='data-form' ng-submit="generateGame()">
+				<form autocomplete="off" id='data-form' ng-submit="generateGame()">
 
-					<input id="user" ng-model="user" placeholder="username"/>
-					<input id="group" ng-model="group" placeholder="group name"/>
+					<input id="user" name="user" ng-model="user" class="{{validate? 'invalid' : 'test'}}" placeholder="{{validate || 'username'}}"/>
 					
 					<button>Play</button>
 

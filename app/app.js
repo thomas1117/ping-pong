@@ -47,9 +47,16 @@ myApp.config(function($stateProvider, $urlRouterProvider){
 myApp.controller('main',function($scope){
     
     $scope.generateGame = function(user) {
-          var group = randomstring();
 
-          console.log(group)
+        if($scope.user) {
+            var group = randomstring();
+            console.log(group)
+        }
+        else {
+            $scope.validate = "You need a username!"
+        }
+
+          
     }
 
 });
