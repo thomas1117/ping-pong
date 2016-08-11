@@ -2,14 +2,18 @@
 <div ng-controller="main">
 	<div class="wrap">
 			<div class="form-contain">
-				<h2>PONG</h2>
+				<h2 class='title'>PONG</h2>
 				<form autocomplete="off" id='data-form' ng-submit="generateGame()">
 
 					<input id="user" name="user" ng-model="user" class="{{validate? 'invalid' : 'test'}}" placeholder="{{validate || 'username'}}"/>
 					
-					<button>Play</button>
+					<a ng-click="navigate(user)" class="button" href="http://localhost:3000/#/game?channel={{channel}}" ng-show="channel">Play</a>
 
 				</form>
+			</div>
+			<div class='notify' ng-show="channel">
+			<h2 class='code'>Send this link to your friend!</h2>
+			<h2 class='code'>http://localhost:3000/#/game?channel={{channel}}</h3>
 			</div>
 	</div>
 </div>

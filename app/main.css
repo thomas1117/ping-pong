@@ -12,7 +12,7 @@ body {
 	box-sizing: border-box;
 }
 
-h2 {
+.title {
 	margin:0;
 	padding:0;
 	margin-bottom: 40px;
@@ -24,7 +24,7 @@ h2 {
 
 .wrap {
 	position:absolute;
-  	height:100vh;
+  	height:100%;
   	width:100%;
   	text-align:center;
   	background-color: #000;
@@ -67,5 +67,25 @@ button {
 }
 .invalid::-ms-input-placeholder { /* WebKit browsers */
     color:    red;
+}
+
+.code {
+	color:#fff;
+	padding: 0;
+	margin:0;
+}
+
+.notify {
+	position: relative;
+	top:280px;
+}
+
+a.button {
+	float: right;
+	outline:none;
+	border:1px solid #f7f7f7;
+	padding:10px 15px 10px 15px;
+	background-color: #ddd;
+	text-decoration:none;
 }
 

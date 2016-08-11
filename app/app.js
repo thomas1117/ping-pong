@@ -25,7 +25,7 @@ var {centerX,centerY,
 
 var myApp = angular.module('myApp',['ui.router']);
 
-myApp.config(function($stateProvider, $urlRouterProvider){
+myApp.config(function($stateProvider, $urlRouterProvider,$locationProvider){
 	$urlRouterProvider.otherwise('/landing');
     
     $stateProvider
@@ -47,21 +47,32 @@ myApp.config(function($stateProvider, $urlRouterProvider){
 myApp.controller('main',function($scope){
     
     $scope.generateGame = function(user) {
-
+        if($scope.channel) {
+            return;
+        }
         if($scope.user) {
-            var group = randomstring();
-            console.log(group)
+            $scope.channel = randomstring(8);
+            
         }
         else {
-            $scope.validate = "You need a username!"
+            $scope.validate = "You need a username!";
         }
 
           
     }
 
+    $scope.navigate = function(user) {
+        socket.emit("username",{
+            username:user
+        })
+    }
+
 });
 
-myApp.controller('game',function($scope,$window,$interval){
+myApp.controller('game',function($scope,$window,$interval,$location){
+
+
+    var room = $location.search()['channel'];
 
     var canvas = document.getElementById("pong");
     var ctx = canvas.getContext("2d");
@@ -100,9 +111,17 @@ myApp.controller('game',function($scope,$window,$interval){
 
 
     socket.on('connect',function(){
-    
+        
+        socket.emit("joinRoom",{
+            room:room
+        });
+
         socket.on("player1Move",function(resp){
             paddle2Y = resp.position;
+        });
+
+        socket.on("playerAdd",function(resp){
+            console.log(resp)
         })
 
     });
