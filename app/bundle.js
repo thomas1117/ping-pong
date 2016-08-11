@@ -64,6 +64,8 @@
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+	var centerX = variable.centerX;
+	var centerY = variable.centerY;
 	var canvasWidth = variable.canvasWidth;
 	var canvasHeight = variable.canvasHeight;
 	var paddleWidth = variable.paddleWidth;
@@ -101,12 +103,12 @@
 	    });
 	});
 
-	myApp.controller('main', function ($scope) {
-
-	    console.log($scope);
-	});
+	myApp.controller('main', function ($scope) {});
 
 	myApp.controller('game', function ($scope, $window, $interval) {
+
+	    var canvas = document.getElementById("pong");
+	    var ctx = canvas.getContext("2d");
 
 	    $window.addEventListener('resize', resizeCanvas, false);
 	    $scope.load = function () {
@@ -120,17 +122,20 @@
 	    function drawEverything() {
 
 	        (0, _drawShapes.drawBackground)(canvas, ctx, canvasWidth, canvasHeight, '#000');
+
 	        (0, _drawShapes.drawPaddle1)(ctx, 0, paddle1Y, '#fff', paddleWidth, paddleHeight);
 	        (0, _drawShapes.drawPaddle2)(ctx, canvasWidth - paddleWidth, paddle2Y, '#fff', paddleWidth, paddleHeight);
-	        ctx.font = '2rem arial';
-	        ctx.fillText(player1Score, canvasWidth / 4, 40);
-	        ctx.fillText(player2Score, canvasWidth - canvasWidth / 4, 40);
+
+	        (0, _drawShapes.drawScores)(ctx, player1Score, player2Score, canvasWidth);
+
 	        (0, _drawShapes.drawBall)(ctx, ballX, ballY, ballSize);
+
 	        moveBall();
 	    }
 
-	    var canvas = document.getElementById("pong");
-	    var ctx = canvas.getContext("2d");
+	    function resizeCanvas() {
+	        drawEverything();
+	    }
 
 	    function calculateMousePos(evt) {
 	        return evt.clientY;
@@ -151,13 +156,10 @@
 	        }
 	    });
 
-	    function resizeCanvas() {
-	        drawEverything();
-	    }
-
 	    function resetGame(str) {
-	        ballX = canvasWidth / 2;
-	        ballY = canvasHeight / 2;
+
+	        ballX = centerX;
+	        ballY = centerY;
 
 	        if (str === 'goLeft') {
 
@@ -184,10 +186,18 @@
 
 	            gameEnd();
 	        }
+	        return;
 	    }
 
 	    function gameEnd() {
-	        console.log('game ended');
+	        drawText();
+	    }
+
+	    function drawText() {
+	        $interval(function () {
+	            ctx.font = '2rem arial';
+	            ctx.fillText("play again?", canvasWidth / 2, canvasHeight / 3);
+	        }, frameRate);
 	    }
 
 	    function moveBall() {
@@ -232,8 +242,10 @@
 
 	    function handleVertical() {
 	        if (ballY > canvasHeight) {
+
 	            ballSpeedY = -ballSpeedY;
 	        } else if (ballY <= 0) {
+
 	            ballSpeedY = -ballSpeedY;
 	        }
 	    }
@@ -19236,38 +19248,45 @@
 /* 4 */
 /***/ function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
-	    value: true
+	        value: true
 	});
 	function drawBackground(canvas, ctx, width, height, color) {
-	    canvas.width = width;
-	    canvas.height = height;
-	    ctx.fillStyle = color;
-	    ctx.fillRect(0, 0, width, height);
+	        canvas.width = width;
+	        canvas.height = height;
+	        ctx.fillStyle = color;
+	        ctx.fillRect(0, 0, width, height);
 	}
 
 	function drawPaddle1(ctx, x, y, color, width, height) {
-	    ctx.fillStyle = color;
-	    ctx.fillRect(x, y, width, height);
+	        ctx.fillStyle = color;
+	        ctx.fillRect(x, y, width, height);
 	}
 
 	function drawPaddle2(ctx, x, y, color, width, height) {
-	    ctx.fillStyle = color;
-	    ctx.fillRect(x, y, width, height);
+	        ctx.fillStyle = color;
+	        ctx.fillRect(x, y, width, height);
 	}
 
 	function drawBall(ctx, x, y, size) {
-	    ctx.beginPath();
-	    ctx.arc(x, y, size, 0, Math.PI * 2);
-	    ctx.fill();
+	        ctx.beginPath();
+	        ctx.arc(x, y, size, 0, Math.PI * 2);
+	        ctx.fill();
+	}
+
+	function drawScores(ctx, p1, p2, canvasWidth) {
+	        ctx.font = '2rem arial';
+	        ctx.fillText(p1, canvasWidth / 4, 40);
+	        ctx.fillText(p2, canvasWidth - canvasWidth / 4, 40);
 	}
 
 	exports.drawBackground = drawBackground;
 	exports.drawPaddle1 = drawPaddle1;
 	exports.drawPaddle2 = drawPaddle2;
 	exports.drawBall = drawBall;
+	exports.drawScores = drawScores;
 
 /***/ },
 /* 5 */
@@ -19277,6 +19296,9 @@
 
 	var canvasWidth = window.innerWidth;
 	var canvasHeight = window.innerHeight;
+
+	var centerX = canvasWidth / 2;
+	var centerY = canvasHeight / 2;
 
 	var paddleWidth = window.innerWidth / 40;
 	var paddleHeight = window.innerHeight / 5;
@@ -19305,6 +19327,8 @@
 	var frameRate = 20;
 
 	module.exports = {
+	    centerX: centerX,
+	    centerY: centerY,
 	    canvasWidth: canvasWidth,
 	    canvasHeight: canvasHeight,
 	    paddleWidth: paddleWidth,

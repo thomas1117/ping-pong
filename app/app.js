@@ -1,11 +1,11 @@
 import angular from 'angular';
 import uiRouter from 'angular-ui-router';
 
-import {drawPaddle1,drawPaddle2,drawBackground,drawBall} from './util/drawShapes.js';
+import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util/drawShapes.js';
 
 import * as variable from './util/constants.js';
 
-var {canvasWidth,canvasHeight,paddleWidth,paddleHeight,paddle1Y,paddle2Y,ballSize,
+var {centerX,centerY,canvasWidth,canvasHeight,paddleWidth,paddleHeight,paddle1Y,paddle2Y,ballSize,
     ballSpeedX,ballSpeedY,originalSpeedX,originalSpeedY,ballX,ballY,speedConst,player1Score,
     player2Score,maxScore,frameRate} = variable;
 
@@ -22,8 +22,7 @@ myApp.config(function($stateProvider, $urlRouterProvider){
             templateUrl: './components/landing.html',
             controller: 'main'
         })
-        
-        
+         
         .state('game', {
         	url: '/game',
             templateUrl: '../components/game.html',
@@ -34,42 +33,44 @@ myApp.config(function($stateProvider, $urlRouterProvider){
 
 myApp.controller('main',function($scope){
     
-    console.log($scope)    
-
 });
 
 myApp.controller('game',function($scope,$window,$interval){
 
+    var canvas = document.getElementById("pong");
+    var ctx = canvas.getContext("2d");
+
     $window.addEventListener('resize', resizeCanvas, false); 
     $scope.load = function() {render}
-    
+
     var render = $interval(function(){ drawEverything() },frameRate);
 
 
     function drawEverything() {
         
         drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
+
         drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
         drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
-        ctx.font = '2rem arial';
-        ctx.fillText(player1Score,canvasWidth/4,40);    
-        ctx.fillText(player2Score,canvasWidth-canvasWidth/4,40); 
-        drawBall(ctx,ballX,ballY,ballSize);
-        moveBall();         
-}
 
-    var canvas = document.getElementById("pong");
-    var ctx = canvas.getContext("2d");
+        drawScores(ctx,player1Score,player2Score,canvasWidth);
+
+        drawBall(ctx,ballX,ballY,ballSize);
+
+        moveBall();         
+    }
+
+    function resizeCanvas() {
+       drawEverything();     
+    }
 
     
-
     function calculateMousePos(evt) {
         return evt.clientY;
        
     }
 
-    canvas.addEventListener('mousemove',
-        function(event){
+    canvas.addEventListener('mousemove',function(event){
             
             var mousePos = calculateMousePos(event);
 
@@ -83,30 +84,25 @@ myApp.controller('game',function($scope,$window,$interval){
 
                 paddle1Y = canvasHeight - paddleHeight;
             }  
-        })
+    });
 
-    
-    function resizeCanvas() {
-       drawEverything();     
-    }
-
-    
-       
-    
     function resetGame(str){
-        ballX = canvasWidth/2;
-        ballY = canvasHeight/2;
+
+        ballX = centerX;
+        ballY = centerY;
         
 
         if(str==='goLeft') {
             
             player1Score+=10;
+            
 
             ballSpeedX = -originalSpeedX;
             ballSpeedY = -originalSpeedY;
         }
         else {
             player2Score+=10;
+
 
             ballSpeedX = originalSpeedX;
             ballSpeedY = originalSpeedY;
@@ -127,13 +123,22 @@ myApp.controller('game',function($scope,$window,$interval){
             gameEnd();
             
         }
+        return;
         
     }
 
     function gameEnd() {
-        console.log('game ended')
+        drawText();
+        
     }
 
+    function drawText() {
+        $interval(function(){
+            ctx.font = '2rem arial';
+            ctx.fillText("play again?",canvasWidth/2,canvasHeight/3);
+        },frameRate)
+        
+    }
 
 
     function moveBall() {
@@ -189,10 +194,14 @@ myApp.controller('game',function($scope,$window,$interval){
 
     function handleVertical() {
         if(ballY > canvasHeight) {
+
             ballSpeedY = -ballSpeedY;
+
         }
         else if (ballY <=0) {
+
             ballSpeedY = -ballSpeedY;
+
         }
     }
     

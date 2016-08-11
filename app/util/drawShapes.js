@@ -23,11 +23,18 @@ function drawBall(ctx,x,y,size) {
         ctx.fill();
 }
 
+function drawScores(ctx,p1,p2,canvasWidth){
+        ctx.font = '2rem arial';
+        ctx.fillText(p1,canvasWidth/4,40);    
+        ctx.fillText(p2,canvasWidth-canvasWidth/4,40); 
+}
+
 
 export  {
     drawBackground,
     drawPaddle1,
     drawPaddle2,
     drawBall,
+    drawScores
 }
 

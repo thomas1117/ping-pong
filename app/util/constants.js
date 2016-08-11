@@ -1,6 +1,9 @@
 var canvasWidth = window.innerWidth;
 var canvasHeight = window.innerHeight;
 
+var centerX = canvasWidth/2;
+var centerY = canvasHeight/2;
+
 var paddleWidth = window.innerWidth/40;
 var paddleHeight = window.innerHeight/5;
 
@@ -28,6 +31,8 @@ var ticking = true;
 var frameRate = 20;
 
 module.exports = {
+    centerX,
+    centerY,
     canvasWidth,
     canvasHeight,
     paddleWidth,
