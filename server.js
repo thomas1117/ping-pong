@@ -82,11 +82,9 @@ io.on('connection', function(socket){
 		io.sockets.emit("playerAdd",{
 			players:users
 		});
-
-		
+	
 	})
 })
-
 
 app.get('*',function(req,res){
 	res.sendFile(__dirname + '/public/index.html');

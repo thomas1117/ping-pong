@@ -73,6 +73,8 @@ myApp.controller('game',function($scope,$window,$interval,$location){
     var socket = io();
     var users = [];
     
+    console.log('testing');
+    
     socket.on('connect',function(){
         
         socket.emit("joinRoom",{
