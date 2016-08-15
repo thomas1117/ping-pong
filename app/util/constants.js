@@ -28,7 +28,7 @@ var player2Score = 0;
 var maxScore = 10;
 
 var ticking = true;
-var frameRate = 20;
+var frameRate = 2;
 
 module.exports = {
     centerX,

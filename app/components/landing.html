@@ -7,13 +7,13 @@
 
 					<input id="user" name="user" ng-model="user" class="{{validate? 'invalid' : 'test'}}" placeholder="{{validate || 'username'}}"/>
 					
-					<a ng-click="navigate(user)" class="button" href="https://stormy-stream-15316.herokuapp.com/#/game?channel={{channel}}" ng-show="channel">Play</a>
+					<a ng-click="navigate(user)" class="button" href="http://localhost:3000/#/game?channel={{channel}}" ng-show="channel">Play</a>
 
 				</form>
 			</div>
 			<div class='notify' ng-show="channel">
 			<h2 class='code'>Send this link to your friend!</h2>
-			<h2 class='code'>https://stormy-stream-15316.herokuapp.com/#/game?channel={{channel}}</h3>
+			<h2 class='code'>http://localhost:3000/#/game?channel={{channel}}</h3>
 			</div>
 	</div>
 </div>
