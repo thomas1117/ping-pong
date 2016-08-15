@@ -27,7 +27,7 @@ var player2;
 
 var myApp = angular.module('myApp',['ui.router']);
 
-myApp.config(function($stateProvider, $urlRouterProvider){
+myApp.config(function($stateProvider, $urlRouterProvider,$locationProvider){
 	$urlRouterProvider.otherwise('/landing');
     
     $stateProvider
@@ -44,7 +44,7 @@ myApp.config(function($stateProvider, $urlRouterProvider){
             controller: 'game'
                   
         })
-});
+})
 
 myApp.controller('main',function($scope){
     
