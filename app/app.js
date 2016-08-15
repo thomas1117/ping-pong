@@ -6,6 +6,7 @@ import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util
 
 import * as variable from './util/constants.js';
 
+// https://stormy-stream-15316.herokuapp.com
 var {centerX,centerY,
     canvasWidth,canvasHeight,
     paddleWidth,paddleHeight,
@@ -68,7 +69,7 @@ myApp.controller('main',function($scope){
 
 });
 
-myApp.controller('game',['$scope','$window','$interval','$location',function($scope,$window,$interval,$location){
+myApp.controller('game',function($scope,$window,$interval,$location){
     var socket = io();
     var users = [];
     
@@ -395,4 +396,4 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         }
     }
     
-}])
+})
