@@ -318,7 +318,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
             ballX:x,
             ballY:y
         });
-        console.log(x,y)
+        
     }
 
     function relayBallSpeedX(x) {
