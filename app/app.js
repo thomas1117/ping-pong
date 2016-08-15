@@ -22,6 +22,9 @@ var {centerX,centerY,
     maxScore,
     frameRate} = variable;
 
+var player1;
+var player2;
+
 
 var myApp = angular.module('myApp',['ui.router']);
 
@@ -70,8 +73,36 @@ myApp.controller('main',function($scope){
 });
 
 myApp.controller('game',function($scope,$window,$interval,$location){
+    var socket = io();
+    socket.on('connect',function(){
+        
+        socket.emit("joinRoom",{
+            room:room
+    });
 
+        socket.on("playerMove",function(resp){
+            
+            if(resp.player==="player1") {
+                paddle1Y = resp.position;
+                console.log('youre player 1')
+                
+            }
+            else {
+               paddle2Y = resp.position; 
+               console.log('yuore player 2')
+            }
+            
 
+        });
+
+        socket.on("playerAdd",function(resp){
+            player1 = resp.players[0].id.substring(2);
+            player2 = resp.players[1].id.substring(2);
+        })
+
+    });
+
+    
     var room = $location.search()['channel'];
 
     var canvas = document.getElementById("pong");
@@ -110,36 +141,15 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
 
 
-    socket.on('connect',function(){
-        
-        socket.emit("joinRoom",{
-            room:room
-        });
-
-        socket.on("player1Move",function(resp){
-            paddle2Y = resp.position;
-        });
-
-        socket.on("playerAdd",function(resp){
-            console.log(resp)
-        })
-
-    });
+    
 
     canvas.addEventListener('mousemove',function(event){
+           console.log(socket.id)
+            if(socket.id===player1) {
+                console.log("you're player 1");
+                var mousePos = calculateMousePos(event);
 
-            //socket user check??
-
-            /*if(user1){
-                socket.emit("moveY",{position:paddle1Y})
-
-            else {socket.emit("moveY",{position:paddle2Y})}
-
-            }*/
-            
-            var mousePos = calculateMousePos(event);
-
-            paddle1Y = mousePos - (paddleHeight/2); 
+                paddle1Y = mousePos - (paddleHeight/2); 
         
             if(paddle1Y <= 0) {
 
@@ -151,8 +161,34 @@ myApp.controller('game',function($scope,$window,$interval,$location){
             }  
 
             socket.emit("moveY",{
-                position: paddle1Y
-            })
+                position: paddle1Y,
+                player:"player1"
+            });
+
+            }
+            else if(socket.id===player2) {
+                console.log("you're player 2");
+                if(socket.id===player2) {
+                    var mousePos = calculateMousePos(event);
+
+                    paddle2Y = mousePos - (paddleHeight/2); 
+                
+                if(paddle2Y <= 0) {
+
+                    paddle2Y=0;
+                } 
+                else if(paddle2Y + paddleHeight >= canvasHeight) {
+
+                    paddle2Y = canvasHeight - paddleHeight;
+                }
+
+                }
+                socket.emit("moveY",{
+                position: paddle2Y,
+                player:"player2"
+                });
+            }
+            
     });
 
     function resetGame(str){

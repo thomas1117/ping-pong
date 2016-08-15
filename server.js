@@ -6,22 +6,36 @@ var io = require('socket.io')(http);
 app.set('port', (process.env.PORT || 3000));
 app.use(express.static(__dirname + "/app"));
 
-http.listen(app.get('port'), function() {
+http.listen(app.get('port'), '0.0.0.0', function() {
   console.log('Server running on localhost:'+app.get('port'));
 });
 
 var clientInfo = {};
 var users = [];
 
-io.on('connection', function(socket){
-  	socket.on('disconnect',function(){
-  		var userData = clientInfo[socket.id];
 
-  		if(typeof userData !=='undefined') {
-  			socket.leave(userData.room);
+io.on('connection', function(socket){
+	
+  	socket.on('disconnect',function(){
+  		
+  		var userData = clientInfo[socket.id];
+  		
+  		if(typeof socket.id !=='undefined') {
+  			
+  			socket.leave(socket.room);
+  			users = users.filter(function(obj){
+  			
+  				if(obj.id !== clientInfo.id) {
+  					
+  					return true;
+  				}
+
+  			});
+  			
+  			clientInfo = {};
   		}
 
-  		clientInfo = {};
+  		
 
   	})
   	socket.on('moveY',function(req){
@@ -35,23 +49,28 @@ io.on('connection', function(socket){
 	})
 
 	socket.on("joinRoom",function(req){
-		clientInfo[socket.id] = req;
+		
+	
+		clientInfo['id'] = socket.id;
+		clientInfo['room'] = req.room;
 		users.push(clientInfo);
 
-		socket.broadcast.to(req.room).emit("playerAdd",{
+		io.sockets.emit("playerAdd",{
 			players:users
-		})
+		});
+
+		
 	})
 })
 
 
-app.get('/',function(req,res){
-	res.sendFile(__dirname + '/public/index.html')
-})
+app.get('*',function(req,res){
+	res.sendFile(__dirname + '/public/index.html');
+});
 
 function sendPlayerData(req) {
 	
-	io.sockets.emit('player1Move',{
+	io.sockets.emit('playerMove',{
 		position:req.position
 	})
 };
