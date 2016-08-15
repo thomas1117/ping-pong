@@ -46,7 +46,7 @@ myApp.config(function($stateProvider,$locationProvider){
         })
 })
 
-myApp.controller('main',function($scope){
+myApp.controller('main',['$scope',function($scope){
     
     $scope.generateGame = function(user) {
         if($scope.channel) {
@@ -67,7 +67,7 @@ myApp.controller('main',function($scope){
         })
     }
 
-});
+}]);
 
 myApp.controller('game',['$scope','$window','$interval','$location',function($scope,$window,$interval,$location){
     var socket = io();
