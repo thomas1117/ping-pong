@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "webpack --watch & nodemon server.js"
+    "dev": "webpack --watch & nodemon server.js",
+    "postinstall": "webpack -p",
+    "start": "NODE_ENV=production; node server.js"
   },
   "author": "",
   "license": "ISC",
@@ -14,7 +16,9 @@
     "babel-cli": "^6.11.4",
     "express": "^4.14.0",
     "just.randomstring": "^0.1.1",
-    "socket.io": "^1.4.8"
+    "nodemon": "^1.10.0",
+    "socket.io": "^1.4.8",
+    "webpack": "^1.13.1"
   },
   "devDependencies": {
     "babel-cli": "^6.11.4",
