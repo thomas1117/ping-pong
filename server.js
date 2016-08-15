@@ -39,6 +39,7 @@ io.on('connection', function(socket){
 
   	})
   	socket.on('moveY',function(req){
+
   		sendPlayerData(req);
 
 
@@ -71,6 +72,7 @@ app.get('*',function(req,res){
 function sendPlayerData(req) {
 	
 	io.sockets.emit('playerMove',{
+    player:req.player,
 		position:req.position
 	})
 };

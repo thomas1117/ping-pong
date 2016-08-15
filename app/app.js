@@ -6,6 +6,7 @@ import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util
 
 import * as variable from './util/constants.js';
 
+// https://stormy-stream-15316.herokuapp.com
 
 
 var {centerX,centerY,
@@ -81,13 +82,13 @@ myApp.controller('game',function($scope,$window,$interval,$location){
     });
 
         socket.on("playerMove",function(resp){
-            
+        
             if(resp.player==="player1") {
                 paddle1Y = resp.position;
                 console.log('youre player 1')
                 
             }
-            else {
+            else if(resp.player==="player2"){
                paddle2Y = resp.position; 
                console.log('yuore player 2')
             }
@@ -97,7 +98,11 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
         socket.on("playerAdd",function(resp){
             player1 = resp.players[0].id.substring(2);
-            player2 = resp.players[1].id.substring(2);
+
+            if(resp.players[1]) {
+                player2 = resp.players[1].id.substring(2);
+            }
+            
         })
 
     });
@@ -144,30 +149,31 @@ myApp.controller('game',function($scope,$window,$interval,$location){
     
 
     canvas.addEventListener('mousemove',function(event){
-           console.log(socket.id)
+            var tempPos;
+
             if(socket.id===player1) {
-                console.log("you're player 1");
+              
                 var mousePos = calculateMousePos(event);
 
                 paddle1Y = mousePos - (paddleHeight/2); 
         
-            if(paddle1Y <= 0) {
+                if(paddle1Y <= 0) {
 
-                paddle1Y=0;
-            } 
-            else if(paddle1Y + paddleHeight >= canvasHeight) {
+                    paddle1Y=0;
+                } 
+                else if(paddle1Y + paddleHeight >= canvasHeight) {
 
-                paddle1Y = canvasHeight - paddleHeight;
-            }  
+                    paddle1Y = canvasHeight - paddleHeight;
+                }  
 
-            socket.emit("moveY",{
-                position: paddle1Y,
-                player:"player1"
-            });
+                socket.emit("moveY",{
+                    position: paddle1Y,
+                    player:"player1"
+                });
 
             }
             else if(socket.id===player2) {
-                console.log("you're player 2");
+                
                 if(socket.id===player2) {
                     var mousePos = calculateMousePos(event);
 

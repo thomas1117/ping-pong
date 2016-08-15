@@ -66,6 +66,9 @@
 	
 	var randomstring = __webpack_require__(6);
 	
+	// https://stormy-stream-15316.herokuapp.com
+	
+	
 	var centerX = variable.centerX;
 	var centerY = variable.centerY;
 	var canvasWidth = variable.canvasWidth;
@@ -141,7 +144,7 @@
 	            if (resp.player === "player1") {
 	                paddle1Y = resp.position;
 	                console.log('youre player 1');
-	            } else {
+	            } else if (resp.player === "player2") {
 	                paddle2Y = resp.position;
 	                console.log('yuore player 2');
 	            }
@@ -149,7 +152,10 @@
 	
 	        socket.on("playerAdd", function (resp) {
 	            player1 = resp.players[0].id.substring(2);
-	            player2 = resp.players[1].id.substring(2);
+	
+	            if (resp.players[1]) {
+	                player2 = resp.players[1].id.substring(2);
+	            }
 	        });
 	    });
 	
@@ -187,9 +193,10 @@
 	    }
 	
 	    canvas.addEventListener('mousemove', function (event) {
-	        console.log(socket.id);
+	        var tempPos;
+	
 	        if (socket.id === player1) {
-	            console.log("you're player 1");
+	
 	            var mousePos = calculateMousePos(event);
 	
 	            paddle1Y = mousePos - paddleHeight / 2;
@@ -207,7 +214,7 @@
 	                player: "player1"
 	            });
 	        } else if (socket.id === player2) {
-	            console.log("you're player 2");
+	
 	            if (socket.id === player2) {
 	                var mousePos = calculateMousePos(event);
 	
