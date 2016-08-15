@@ -69,331 +69,331 @@ myApp.controller('main',function($scope){
 
 });
 
-myApp.controller('game',function($scope,$window,$interval,$location){
-    var socket = io();
-    var users = [];
+// myApp.controller('game',function($scope,$window,$interval,$location){
+//     var socket = io();
+//     var users = [];
     
-    socket.on('connect',function(){
+//     socket.on('connect',function(){
         
-        socket.emit("joinRoom",{
-            room:room
-        });
+//         socket.emit("joinRoom",{
+//             room:room
+//         });
 
-        socket.on("playerAdd",function(resp){
+//         socket.on("playerAdd",function(resp){
             
-            player1 = resp.players[0].id.substring(2);
-            users.push(player1);
+//             player1 = resp.players[0].id.substring(2);
+//             users.push(player1);
 
-            if(resp.players[1]) {
-                player2 = resp.players[1].id.substring(2);
-                users.push(player2)
-            }
+//             if(resp.players[1]) {
+//                 player2 = resp.players[1].id.substring(2);
+//                 users.push(player2)
+//             }
                 
-        });
+//         });
 
-        socket.on("scoreTrack",function(resp){
+//         socket.on("scoreTrack",function(resp){
                 
-                player1Score = resp.player1Score;
-                player2Score = resp.player2Score;
-        });
+//                 player1Score = resp.player1Score;
+//                 player2Score = resp.player2Score;
+//         });
 
-        socket.on("paddleMove",function(resp){
+//         socket.on("paddleMove",function(resp){
             
-            if(resp.player==="player1") {
+//             if(resp.player==="player1") {
                     
-                paddle1Y = resp.position;
-            }
+//                 paddle1Y = resp.position;
+//             }
             
-            else if(resp.player==="player2"){
+//             else if(resp.player==="player2"){
                    
-                paddle2Y = resp.position; 
+//                 paddle2Y = resp.position; 
                    
-            }
+//             }
                 
-        });
+//         });
 
-        socket.on("ballPosition",function(resp){   
+//         socket.on("ballPosition",function(resp){   
             
-            ballX = resp.ballX;
-            ballY = resp.ballY;
+//             ballX = resp.ballX;
+//             ballY = resp.ballY;
 
-        });
+//         });
 
-        socket.on("ballSpeedTrackX",function(resp){
+//         socket.on("ballSpeedTrackX",function(resp){
             
-            ballSpeedX = resp.ballSpeedX;
+//             ballSpeedX = resp.ballSpeedX;
 
-        });
+//         });
 
-        socket.on("ballSpeedTrackY",function(resp){
+//         socket.on("ballSpeedTrackY",function(resp){
             
-            ballSpeedY = resp.ballSpeedY;
+//             ballSpeedY = resp.ballSpeedY;
 
-        });
+//         });
 
-    });
+//     });
 
     
-    var room = $location.search()['channel'];
+//     var room = $location.search()['channel'];
 
-    var canvas = document.getElementById("pong");
-    var ctx = canvas.getContext("2d");
+//     var canvas = document.getElementById("pong");
+//     var ctx = canvas.getContext("2d");
 
-    var render = $interval(function(){ drawEverything() },frameRate);
+//     var render = $interval(function(){ drawEverything() },frameRate);
 
-    $window.addEventListener('resize', drawEverything, false); 
+//     $window.addEventListener('resize', drawEverything, false); 
 
-    $scope.load = function() {
-        render
-    }
+//     $scope.load = function() {
+//         render
+//     }
 
     
 
 
-    function drawEverything() {
+//     function drawEverything() {
         
-        drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
+//         drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
 
-        drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
-        drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
+//         drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
+//         drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
 
-        drawScores(ctx,player1Score,player2Score,canvasWidth);
+//         drawScores(ctx,player1Score,player2Score,canvasWidth);
 
-        drawBall(ctx,ballX,ballY,ballSize);
+//         drawBall(ctx,ballX,ballY,ballSize);
 
-        moveBall();         
-    }
-
-    
+//         moveBall();         
+//     }
 
     
-    function calculateMousePos(evt) {
-        return evt.clientY;
+
+    
+//     function calculateMousePos(evt) {
+//         return evt.clientY;
        
-    }
+//     }
 
 
 
     
 
-    canvas.addEventListener('mousemove',function(event){
-            var tempPos;
+//     canvas.addEventListener('mousemove',function(event){
+//             var tempPos;
 
-            if(socket.id===player1) {
+//             if(socket.id===player1) {
               
-                var mousePos = calculateMousePos(event);
+//                 var mousePos = calculateMousePos(event);
 
-                paddle1Y = mousePos - (paddleHeight/2); 
+//                 paddle1Y = mousePos - (paddleHeight/2); 
         
-                if(paddle1Y <= 0) {
+//                 if(paddle1Y <= 0) {
 
-                    paddle1Y=0;
-                } 
-                else if(paddle1Y + paddleHeight >= canvasHeight) {
+//                     paddle1Y=0;
+//                 } 
+//                 else if(paddle1Y + paddleHeight >= canvasHeight) {
 
-                    paddle1Y = canvasHeight - paddleHeight;
-                }  
+//                     paddle1Y = canvasHeight - paddleHeight;
+//                 }  
 
-                socket.emit("moveY",{
-                    position: paddle1Y,
-                    player:"player1"
-                });
+//                 socket.emit("moveY",{
+//                     position: paddle1Y,
+//                     player:"player1"
+//                 });
 
-            }
-            else if(socket.id===player2) {
+//             }
+//             else if(socket.id===player2) {
                 
-                if(socket.id===player2) {
-                    var mousePos = calculateMousePos(event);
+//                 if(socket.id===player2) {
+//                     var mousePos = calculateMousePos(event);
 
-                    paddle2Y = mousePos - (paddleHeight/2); 
+//                     paddle2Y = mousePos - (paddleHeight/2); 
                 
-                if(paddle2Y <= 0) {
+//                 if(paddle2Y <= 0) {
 
-                    paddle2Y=0;
-                } 
-                else if(paddle2Y + paddleHeight >= canvasHeight) {
+//                     paddle2Y=0;
+//                 } 
+//                 else if(paddle2Y + paddleHeight >= canvasHeight) {
 
-                    paddle2Y = canvasHeight - paddleHeight;
-                }
+//                     paddle2Y = canvasHeight - paddleHeight;
+//                 }
 
-                }
-                socket.emit("moveY",{
-                position: paddle2Y,
-                player:"player2"
-                });
-            }
+//                 }
+//                 socket.emit("moveY",{
+//                 position: paddle2Y,
+//                 player:"player2"
+//                 });
+//             }
             
-    });
+//     });
 
-    function resetGame(str){
+//     function resetGame(str){
 
         
 
-        relayBallPosition(centerX,centerY)
+//         relayBallPosition(centerX,centerY)
         
 
-        if(str==='goLeft') {
+//         if(str==='goLeft') {
            
-            player1Score+=1;
+//             player1Score+=1;
 
-            relayScore(player1Score,player2Score)
+//             relayScore(player1Score,player2Score)
 
             
 
-            relayBallSpeedX(-originalSpeedX);
-            relayBallSpeedY(-originalSpeedY);
-        }
-        else {
-            player2Score+=1;
+//             relayBallSpeedX(-originalSpeedX);
+//             relayBallSpeedY(-originalSpeedY);
+//         }
+//         else {
+//             player2Score+=1;
 
-            relayScore(player1Score,player2Score)
+//             relayScore(player1Score,player2Score)
 
 
-            relayBallSpeedX(originalSpeedX);
-            relayBallSpeedY(originalSpeedY);
-        }
-
-        
+//             relayBallSpeedX(originalSpeedX);
+//             relayBallSpeedY(originalSpeedY);
+//         }
 
         
 
-        handleScore(player1Score,player2Score)
         
-        
-    }
 
-    function relayScore(p1,p2){
-        socket.emit("score",{
-            player1Score:p1,
-            player2Score:p2
-        });
-    }
+//         handleScore(player1Score,player2Score)
+        
+        
+//     }
+
+//     function relayScore(p1,p2){
+//         socket.emit("score",{
+//             player1Score:p1,
+//             player2Score:p2
+//         });
+//     }
 
     
-    function handleScore(p1,p2) {
+//     function handleScore(p1,p2) {
        
-        if(p1 === maxScore || p2 === maxScore) {
-            $interval(function(){
-                $interval.cancel(render)
-            },frameRate);
+//         if(p1 === maxScore || p2 === maxScore) {
+//             $interval(function(){
+//                 $interval.cancel(render)
+//             },frameRate);
 
-            gameEnd();
+//             gameEnd();
             
-        }
-        return;
+//         }
+//         return;
         
-    }
+//     }
 
-    function gameEnd() {
-        drawText();
+//     function gameEnd() {
+//         drawText();
         
-    }
+//     }
 
-    function drawText() {
-        $interval(function(){
-            ctx.font = '2rem arial';
-            ctx.fillText("play again?",canvasWidth/2,canvasHeight/3);
-        },frameRate)
+//     function drawText() {
+//         $interval(function(){
+//             ctx.font = '2rem arial';
+//             ctx.fillText("play again?",canvasWidth/2,canvasHeight/3);
+//         },frameRate)
         
-    }
+//     }
 
 
-    function moveBall() {
+//     function moveBall() {
         
 
-        relayBallPosition(ballX += ballSpeedX,ballY += ballSpeedY);
+//         relayBallPosition(ballX += ballSpeedX,ballY += ballSpeedY);
 
 
 
-        handleHorizontal();
-        handleVertical();
+//         handleHorizontal();
+//         handleVertical();
                 
-    }
+//     }
 
-    function relayBallPosition(x,y) {
-        socket.emit("ballMove",{
-            ballX:x,
-            ballY:y
-        });
-    }
+//     function relayBallPosition(x,y) {
+//         socket.emit("ballMove",{
+//             ballX:x,
+//             ballY:y
+//         });
+//     }
 
-    function relayBallSpeedX(x) {
-        socket.emit("ballSpeedX",{
-            ballSpeedX:x
-        })
-    }
+//     function relayBallSpeedX(x) {
+//         socket.emit("ballSpeedX",{
+//             ballSpeedX:x
+//         })
+//     }
 
-    function relayBallSpeedY(y) {
-        socket.emit("ballSpeedY",{
-            ballSpeedY:y
-        })
-    }
+//     function relayBallSpeedY(y) {
+//         socket.emit("ballSpeedY",{
+//             ballSpeedY:y
+//         })
+//     }
 
 
-    function handleHorizontal() {
-        if(ballX < 0 + paddleWidth) {
-            if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
+//     function handleHorizontal() {
+//         if(ballX < 0 + paddleWidth) {
+//             if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+//                 ballSpeedX = -ballSpeedX;
 
-                relayBallSpeedX(ballSpeedX);
+//                 relayBallSpeedX(ballSpeedX);
 
-                variableSpeed(paddle1Y)
+//                 variableSpeed(paddle1Y)
 
-            }
-            else {
-                if(ballX < 0) {
-                    resetGame('goRight')
-                }
+//             }
+//             else {
+//                 if(ballX < 0) {
+//                     resetGame('goRight')
+//                 }
                 
-            }
-        }
+//             }
+//         }
 
-        else if(ballX > canvasWidth -paddleWidth) {
+//         else if(ballX > canvasWidth -paddleWidth) {
 
-            if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
+//             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+//                 ballSpeedX = -ballSpeedX;
 
-                relayBallSpeedX(ballSpeedX);
+//                 relayBallSpeedX(ballSpeedX);
 
-                variableSpeed(paddle2Y)
-            }
-            else {
-                if(ballX > canvasWidth){
-                    resetGame('goLeft')
-                }
+//                 variableSpeed(paddle2Y)
+//             }
+//             else {
+//                 if(ballX > canvasWidth){
+//                     resetGame('goLeft')
+//                 }
                 
-            }
-        }
+//             }
+//         }
        
-    }
+//     }
 
-    function variableSpeed(paddle) {
+//     function variableSpeed(paddle) {
 
-        var deltaY = ballY - (paddle +paddleHeight/2);
+//         var deltaY = ballY - (paddle +paddleHeight/2);
 
-        ballSpeedY = deltaY * speedConst;  
+//         ballSpeedY = deltaY * speedConst;  
 
-        relayBallSpeedY(ballSpeedY) 
+//         relayBallSpeedY(ballSpeedY) 
         
-    }
+//     }
 
-    function handleVertical() {
-        if(ballY > canvasHeight) {
+//     function handleVertical() {
+//         if(ballY > canvasHeight) {
 
-            ballSpeedY = -ballSpeedY;
+//             ballSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(ballSpeedY)
+//             relayBallSpeedY(ballSpeedY)
 
-        }
-        else if (ballY <=0) {
+//         }
+//         else if (ballY <=0) {
 
-            ballSpeedY = -ballSpeedY;
+//             ballSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(ballSpeedY)
+//             relayBallSpeedY(ballSpeedY)
 
-        }
-    }
+//         }
+//     }
     
-})
+// })
