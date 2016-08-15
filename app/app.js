@@ -29,7 +29,7 @@ var myApp = angular.module('myApp',['ui.router']);
 
 myApp.config(['$stateProvider','$locationProvider',function($stateProvider,$locationProvider){
 	
-    $locationProvider.html5Mode(true);
+ 
     $stateProvider
         
         .state('landing', {
