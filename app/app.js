@@ -73,7 +73,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     var socket = io();
     var users = [];
     
-    console.log('testing');
+    
 
     socket.on('connect',function(){
         
@@ -95,8 +95,9 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
         socket.on("scoreTrack",function(resp){
                 
-                player1Score = resp.player1Score;
-                player2Score = resp.player2Score;
+            player1Score = resp.player1Score;
+            player2Score = resp.player2Score;
+
         });
 
         socket.on("paddleMove",function(resp){
@@ -317,6 +318,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
             ballX:x,
             ballY:y
         });
+        console.log(x,y)
     }
 
     function relayBallSpeedX(x) {
