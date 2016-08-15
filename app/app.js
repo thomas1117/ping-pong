@@ -6,7 +6,6 @@ import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util
 
 import * as variable from './util/constants.js';
 
-// https://stormy-stream-15316.herokuapp.com
 var {centerX,centerY,
     canvasWidth,canvasHeight,
     paddleWidth,paddleHeight,

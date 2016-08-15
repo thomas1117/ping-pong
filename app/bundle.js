@@ -66,7 +66,6 @@
 	
 	var randomstring = __webpack_require__(6);
 	
-	// https://stormy-stream-15316.herokuapp.com
 	var centerX = variable.centerX;
 	var centerY = variable.centerY;
 	var canvasWidth = variable.canvasWidth;
@@ -129,7 +128,7 @@
 	    };
 	});
 	
-	myApp.controller('game', function ($scope, $window, $interval, $location) {
+	myApp.controller('game', ['$scope', '$window', '$interval', '$location', function ($scope, $window, $interval, $location) {
 	    var socket = io();
 	    var users = [];
 	
@@ -394,7 +393,7 @@
 	            relayBallSpeedY(ballSpeedY);
 	        }
 	    }
-	});
+	}]);
 
 /***/ },
 /* 1 */
