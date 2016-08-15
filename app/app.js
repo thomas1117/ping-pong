@@ -27,9 +27,9 @@ var player2;
 
 var myApp = angular.module('myApp',['ui.router']);
 
-myApp.config(function($stateProvider, $urlRouterProvider,$locationProvider){
-	$urlRouterProvider.otherwise('/landing');
-    
+myApp.config(function($stateProvider,$locationProvider){
+	
+    $locationProvider.html5Mode(true);
     $stateProvider
         
         .state('landing', {
