@@ -58,9 +58,7 @@ myApp.controller('main',function($scope){
         }
         else {
             $scope.validate = "You need a username!";
-        }
-
-          
+        }    
     }
 
     $scope.navigate = function(user) {
@@ -74,57 +72,64 @@ myApp.controller('main',function($scope){
 myApp.controller('game',function($scope,$window,$interval,$location){
     var socket = io();
     var users = [];
+    
     socket.on('connect',function(){
         
         socket.emit("joinRoom",{
             room:room
-    });
-
-        socket.on("playerMove",function(resp){
-        
-            if(resp.player==="player1") {
-                paddle1Y = resp.position;
-               
-                
-            }
-            else if(resp.player==="player2"){
-               paddle2Y = resp.position; 
-               
-            }
-            
-
         });
-
-        socket.on("scoreTrack",function(resp){
-            
-            player1Score = resp.player1Score;
-            player2Score = resp.player2Score;
-        })
-
-        socket.on("ballTrack",function(resp){
-           
-            ballX = resp.ballX;
-            ballY = resp.ballY;
-        })
-
-        socket.on("ballSpeedTrackX",function(resp){
-            ballSpeedX = resp.ballSpeedX;
-        });
-
-        socket.on("ballSpeedTrackY",function(resp){
-            ballSpeedY = resp.ballSpeedY;
-        })
 
         socket.on("playerAdd",function(resp){
+            
             player1 = resp.players[0].id.substring(2);
-            users.push(player1)
+            users.push(player1);
 
             if(resp.players[1]) {
                 player2 = resp.players[1].id.substring(2);
                 users.push(player2)
             }
+                
+        });
+
+        socket.on("scoreTrack",function(resp){
+                
+                player1Score = resp.player1Score;
+                player2Score = resp.player2Score;
+        });
+
+        socket.on("paddleMove",function(resp){
             
-        })
+            if(resp.player==="player1") {
+                    
+                paddle1Y = resp.position;
+            }
+            
+            else if(resp.player==="player2"){
+                   
+                paddle2Y = resp.position; 
+                   
+            }
+                
+        });
+
+        socket.on("ballPosition",function(resp){   
+            
+            ballX = resp.ballX;
+            ballY = resp.ballY;
+
+        });
+
+        socket.on("ballSpeedTrackX",function(resp){
+            
+            ballSpeedX = resp.ballSpeedX;
+
+        });
+
+        socket.on("ballSpeedTrackY",function(resp){
+            
+            ballSpeedY = resp.ballSpeedY;
+
+        });
 
     });
 
@@ -231,10 +236,7 @@ myApp.controller('game',function($scope,$window,$interval,$location){
            
             player1Score+=1;
 
-            socket.emit("score",{
-            player1Score:player1Score,
-            player2Score:player2Score
-            });
+            relayScore(player1Score,player2Score)
 
             
 
@@ -244,10 +246,7 @@ myApp.controller('game',function($scope,$window,$interval,$location){
         else {
             player2Score+=1;
 
-            socket.emit("score",{
-            player1Score:player1Score,
-            player2Score:player2Score
-            });
+            relayScore(player1Score,player2Score)
 
 
             relayBallSpeedX(originalSpeedX);
@@ -261,6 +260,13 @@ myApp.controller('game',function($scope,$window,$interval,$location){
         handleScore(player1Score,player2Score)
         
         
+    }
+
+    function relayScore(p1,p2){
+        socket.emit("score",{
+            player1Score:p1,
+            player2Score:p2
+        });
     }
 
     

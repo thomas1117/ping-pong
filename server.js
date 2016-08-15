@@ -13,47 +13,44 @@ http.listen(app.get('port'), '0.0.0.0', function() {
 var clientInfo = {};
 var users = [];
 
-
 io.on('connection', function(socket){
 	
   	socket.on('disconnect',function(){
-  		
   		var userData = clientInfo[socket.id];
   		
   		if(typeof socket.id !=='undefined') {
-  			
   			socket.leave(socket.room);
   			users = users.filter(function(obj){
   			
-  				if(obj.id !== clientInfo.id) {
-  					
-  					return true;
-  				}
+    			if(obj.id !== clientInfo.id) {
+    				return true;
+    			}
 
   			});
-  			
-  			clientInfo = {};
+  		
+      clientInfo = {};
+
   		}
 
   		
 
   	})
-  	socket.on('moveY',function(req){
+
+    socket.on('moveY',function(req){
       sendPlayerData(req);
-	});
+    });
 
     socket.on("score",function(req){
         io.sockets.emit("scoreTrack",{
-        player1Score:req.player1Score,
-        player2Score:req.player2Score
+          player1Score:req.player1Score,
+          player2Score:req.player2Score
         });
     })
 
     socket.on("ballMove",function(req){
-
-        io.sockets.emit("ballTrack",{
-        ballX:req.ballX,
-        ballY:req.ballY
+        io.sockets.emit("ballPosition",{
+          ballX:req.ballX,
+          ballY:req.ballY
         });
     })
 
@@ -97,7 +94,7 @@ app.get('*',function(req,res){
 
 function sendPlayerData(req) {
 	
-	io.sockets.emit('playerMove',{
+	io.sockets.emit('paddleMove',{
     player:req.player,
 		position:req.position
 	})
