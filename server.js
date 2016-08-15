@@ -39,11 +39,37 @@ io.on('connection', function(socket){
 
   	})
   	socket.on('moveY',function(req){
-
-  		sendPlayerData(req);
-
-
+      sendPlayerData(req);
 	});
+
+    socket.on("score",function(req){
+        io.sockets.emit("scoreTrack",{
+        player1Score:req.player1Score,
+        player2Score:req.player2Score
+        });
+    })
+
+    socket.on("ballMove",function(req){
+
+        io.sockets.emit("ballTrack",{
+        ballX:req.ballX,
+        ballY:req.ballY
+        });
+    })
+
+    socket.on("ballSpeedX",function(req){
+
+        io.sockets.emit("ballSpeedTrackX",{
+        ballSpeedX:req.ballSpeedX
+        });
+    })
+
+    socket.on("ballSpeedY",function(req){
+
+        io.sockets.emit("ballSpeedTrackY",{
+        ballSpeedY:req.ballSpeedY
+        });
+    })
 
 	socket.on("username",function(req){
 		clientInfo['username'] = req.username;

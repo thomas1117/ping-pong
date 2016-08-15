@@ -67,8 +67,6 @@
 	var randomstring = __webpack_require__(6);
 	
 	// https://stormy-stream-15316.herokuapp.com
-	
-	
 	var centerX = variable.centerX;
 	var centerY = variable.centerY;
 	var canvasWidth = variable.canvasWidth;
@@ -133,6 +131,7 @@
 	
 	myApp.controller('game', function ($scope, $window, $interval, $location) {
 	    var socket = io();
+	    var users = [];
 	    socket.on('connect', function () {
 	
 	        socket.emit("joinRoom", {
@@ -143,18 +142,38 @@
 	
 	            if (resp.player === "player1") {
 	                paddle1Y = resp.position;
-	                console.log('youre player 1');
 	            } else if (resp.player === "player2") {
 	                paddle2Y = resp.position;
-	                console.log('yuore player 2');
 	            }
+	        });
+	
+	        socket.on("scoreTrack", function (resp) {
+	
+	            player1Score = resp.player1Score;
+	            player2Score = resp.player2Score;
+	        });
+	
+	        socket.on("ballTrack", function (resp) {
+	
+	            ballX = resp.ballX;
+	            ballY = resp.ballY;
+	        });
+	
+	        socket.on("ballSpeedTrackX", function (resp) {
+	            ballSpeedX = resp.ballSpeedX;
+	        });
+	
+	        socket.on("ballSpeedTrackY", function (resp) {
+	            ballSpeedY = resp.ballSpeedY;
 	        });
 	
 	        socket.on("playerAdd", function (resp) {
 	            player1 = resp.players[0].id.substring(2);
+	            users.push(player1);
 	
 	            if (resp.players[1]) {
 	                player2 = resp.players[1].id.substring(2);
+	                users.push(player2);
 	            }
 	        });
 	    });
@@ -237,20 +256,29 @@
 	
 	    function resetGame(str) {
 	
-	        ballX = centerX;
-	        ballY = centerY;
+	        relayBallPosition(centerX, centerY);
 	
 	        if (str === 'goLeft') {
 	
 	            player1Score += 1;
 	
-	            ballSpeedX = -originalSpeedX;
-	            ballSpeedY = -originalSpeedY;
+	            socket.emit("score", {
+	                player1Score: player1Score,
+	                player2Score: player2Score
+	            });
+	
+	            relayBallSpeedX(-originalSpeedX);
+	            relayBallSpeedY(-originalSpeedY);
 	        } else {
 	            player2Score += 1;
 	
-	            ballSpeedX = originalSpeedX;
-	            ballSpeedY = originalSpeedY;
+	            socket.emit("score", {
+	                player1Score: player1Score,
+	                player2Score: player2Score
+	            });
+	
+	            relayBallSpeedX(originalSpeedX);
+	            relayBallSpeedY(originalSpeedY);
 	        }
 	
 	        handleScore(player1Score, player2Score);
@@ -280,11 +308,30 @@
 	    }
 	
 	    function moveBall() {
-	        ballX += ballSpeedX;
-	        ballY += ballSpeedY;
+	
+	        relayBallPosition(ballX += ballSpeedX, ballY += ballSpeedY);
 	
 	        handleHorizontal();
 	        handleVertical();
+	    }
+	
+	    function relayBallPosition(x, y) {
+	        socket.emit("ballMove", {
+	            ballX: x,
+	            ballY: y
+	        });
+	    }
+	
+	    function relayBallSpeedX(x) {
+	        socket.emit("ballSpeedX", {
+	            ballSpeedX: x
+	        });
+	    }
+	
+	    function relayBallSpeedY(y) {
+	        socket.emit("ballSpeedY", {
+	            ballSpeedY: y
+	        });
 	    }
 	
 	    function handleHorizontal() {
@@ -292,6 +339,9 @@
 	            if (ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
 	
 	                ballSpeedX = -ballSpeedX;
+	
+	                relayBallSpeedX(ballSpeedX);
+	
 	                variableSpeed(paddle1Y);
 	            } else {
 	                if (ballX < 0) {
@@ -303,6 +353,9 @@
 	            if (ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
 	
 	                ballSpeedX = -ballSpeedX;
+	
+	                relayBallSpeedX(ballSpeedX);
+	
 	                variableSpeed(paddle2Y);
 	            } else {
 	                if (ballX > canvasWidth) {
@@ -317,15 +370,21 @@
 	        var deltaY = ballY - (paddle + paddleHeight / 2);
 	
 	        ballSpeedY = deltaY * speedConst;
+	
+	        relayBallSpeedY(ballSpeedY);
 	    }
 	
 	    function handleVertical() {
 	        if (ballY > canvasHeight) {
 	
 	            ballSpeedY = -ballSpeedY;
+	
+	            relayBallSpeedY(ballSpeedY);
 	        } else if (ballY <= 0) {
 	
 	            ballSpeedY = -ballSpeedY;
+	
+	            relayBallSpeedY(ballSpeedY);
 	        }
 	    }
 	});

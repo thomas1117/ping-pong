@@ -7,8 +7,6 @@ import {drawPaddle1,drawPaddle2,drawBackground,drawBall,drawScores} from './util
 import * as variable from './util/constants.js';
 
 // https://stormy-stream-15316.herokuapp.com
-
-
 var {centerX,centerY,
     canvasWidth,canvasHeight,
     paddleWidth,paddleHeight,
@@ -75,6 +73,7 @@ myApp.controller('main',function($scope){
 
 myApp.controller('game',function($scope,$window,$interval,$location){
     var socket = io();
+    var users = [];
     socket.on('connect',function(){
         
         socket.emit("joinRoom",{
@@ -85,22 +84,44 @@ myApp.controller('game',function($scope,$window,$interval,$location){
         
             if(resp.player==="player1") {
                 paddle1Y = resp.position;
-                console.log('youre player 1')
+               
                 
             }
             else if(resp.player==="player2"){
                paddle2Y = resp.position; 
-               console.log('yuore player 2')
+               
             }
             
 
         });
 
+        socket.on("scoreTrack",function(resp){
+            
+            player1Score = resp.player1Score;
+            player2Score = resp.player2Score;
+        })
+
+        socket.on("ballTrack",function(resp){
+           
+            ballX = resp.ballX;
+            ballY = resp.ballY;
+        })
+
+        socket.on("ballSpeedTrackX",function(resp){
+            ballSpeedX = resp.ballSpeedX;
+        });
+
+        socket.on("ballSpeedTrackY",function(resp){
+            ballSpeedY = resp.ballSpeedY;
+        })
+
         socket.on("playerAdd",function(resp){
             player1 = resp.players[0].id.substring(2);
+            users.push(player1)
 
             if(resp.players[1]) {
                 player2 = resp.players[1].id.substring(2);
+                users.push(player2)
             }
             
         })
@@ -117,7 +138,9 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
     $window.addEventListener('resize', drawEverything, false); 
 
-    $scope.load = function() {render}
+    $scope.load = function() {
+        render
+    }
 
     
 
@@ -199,31 +222,48 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
     function resetGame(str){
 
-        ballX = centerX;
-        ballY = centerY;
+        
+
+        relayBallPosition(centerX,centerY)
         
 
         if(str==='goLeft') {
-            
+           
             player1Score+=1;
+
+            socket.emit("score",{
+            player1Score:player1Score,
+            player2Score:player2Score
+            });
+
             
 
-            ballSpeedX = -originalSpeedX;
-            ballSpeedY = -originalSpeedY;
+            relayBallSpeedX(-originalSpeedX);
+            relayBallSpeedY(-originalSpeedY);
         }
         else {
             player2Score+=1;
 
+            socket.emit("score",{
+            player1Score:player1Score,
+            player2Score:player2Score
+            });
 
-            ballSpeedX = originalSpeedX;
-            ballSpeedY = originalSpeedY;
+
+            relayBallSpeedX(originalSpeedX);
+            relayBallSpeedY(originalSpeedY);
         }
+
+        
+
+        
 
         handleScore(player1Score,player2Score)
         
         
     }
 
+    
     function handleScore(p1,p2) {
        
         if(p1 === maxScore || p2 === maxScore) {
@@ -253,12 +293,34 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
 
     function moveBall() {
-        ballX += ballSpeedX;
-        ballY += ballSpeedY;
+        
+
+        relayBallPosition(ballX += ballSpeedX,ballY += ballSpeedY);
+
+
 
         handleHorizontal();
         handleVertical();
                 
+    }
+
+    function relayBallPosition(x,y) {
+        socket.emit("ballMove",{
+            ballX:x,
+            ballY:y
+        });
+    }
+
+    function relayBallSpeedX(x) {
+        socket.emit("ballSpeedX",{
+            ballSpeedX:x
+        })
+    }
+
+    function relayBallSpeedY(y) {
+        socket.emit("ballSpeedY",{
+            ballSpeedY:y
+        })
     }
 
 
@@ -267,6 +329,9 @@ myApp.controller('game',function($scope,$window,$interval,$location){
             if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
                 
                 ballSpeedX = -ballSpeedX;
+
+                relayBallSpeedX(ballSpeedX);
+
                 variableSpeed(paddle1Y)
 
             }
@@ -283,6 +348,9 @@ myApp.controller('game',function($scope,$window,$interval,$location){
             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
                 ballSpeedX = -ballSpeedX;
+
+                relayBallSpeedX(ballSpeedX);
+
                 variableSpeed(paddle2Y)
             }
             else {
@@ -299,7 +367,9 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
         var deltaY = ballY - (paddle +paddleHeight/2);
 
-        ballSpeedY = deltaY * speedConst;   
+        ballSpeedY = deltaY * speedConst;  
+
+        relayBallSpeedY(ballSpeedY) 
         
     }
 
@@ -308,10 +378,14 @@ myApp.controller('game',function($scope,$window,$interval,$location){
 
             ballSpeedY = -ballSpeedY;
 
+            relayBallSpeedY(ballSpeedY)
+
         }
         else if (ballY <=0) {
 
             ballSpeedY = -ballSpeedY;
+
+            relayBallSpeedY(ballSpeedY)
 
         }
     }
