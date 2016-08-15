@@ -69,12 +69,12 @@ myApp.controller('main',function($scope){
 
 });
 
-myApp.controller('game',function($scope,$window,$interval,$location){
+myApp.controller('game',['$scope','$window','$interval','$location',function($scope,$window,$interval,$location){
     var socket = io();
     var users = [];
     
     console.log('testing');
-    
+
     socket.on('connect',function(){
         
         socket.emit("joinRoom",{
@@ -398,4 +398,4 @@ myApp.controller('game',function($scope,$window,$interval,$location){
         }
     }
     
-})
+}])
