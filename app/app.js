@@ -27,24 +27,24 @@ var player2;
 
 var myApp = angular.module('myApp',['ui.router']);
 
-myApp.config(function($stateProvider, $urlRouterProvider,$locationProvider){
-	$urlRouterProvider.otherwise('/landing');
+// myApp.config(function($stateProvider, $urlRouterProvider,$locationProvider){
+// 	$urlRouterProvider.otherwise('/landing');
     
-    $stateProvider
+//     $stateProvider
         
-        .state('landing', {
-            url: '/landing',
-            templateUrl: './components/landing.html',
-            controller: 'main'
-        })
+//         .state('landing', {
+//             url: '/landing',
+//             templateUrl: './components/landing.html',
+//             controller: 'main'
+//         })
          
-        .state('game', {
-        	url: '/game',
-            templateUrl: './components/game.html',
-            controller: 'game'
+//         .state('game', {
+//         	url: '/game',
+//             templateUrl: './components/game.html',
+//             controller: 'game'
                   
-        });
-});
+//         });
+// });
 
 myApp.controller('main',function($scope){
     
