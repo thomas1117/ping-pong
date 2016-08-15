@@ -27,7 +27,7 @@ var player2;
 
 var myApp = angular.module('myApp',['ui.router']);
 
-myApp.config(function($stateProvider,$locationProvider){
+myApp.config(['$stateProvider','$locationProvider',function($stateProvider,$locationProvider){
 	
     $locationProvider.html5Mode(true);
     $stateProvider
@@ -44,7 +44,7 @@ myApp.config(function($stateProvider,$locationProvider){
             controller: 'game'
                   
         })
-})
+}])
 
 myApp.controller('main',['$scope',function($scope){
     
