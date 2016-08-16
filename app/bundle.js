@@ -92,8 +92,6 @@
 	var player1;
 	var player2;
 	
-	var tick = true;
-	
 	var myApp = _angular2.default.module('myApp', ['ui.router']);
 	
 	myApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
@@ -118,6 +116,7 @@
 	            return;
 	        }
 	        if ($scope.user) {
+	
 	            $scope.channel = randomstring(8);
 	        } else {
 	            $scope.validate = "You need a username!";
@@ -132,14 +131,14 @@
 	}]);
 	
 	myApp.controller('game', ['$scope', '$window', '$interval', '$location', function ($scope, $window, $interval, $location) {
+	
 	    var socket = io();
 	    var users = [];
 	
 	    socket.on('connect', function () {
 	
-	        socket.emit("joinRoom", {
-	            room: room
-	        });
+	        joinRoom();
+	        render();
 	
 	        socket.on("playerAdd", function (resp) {
 	
@@ -191,15 +190,13 @@
 	    var canvas = document.getElementById("pong");
 	    var ctx = canvas.getContext("2d");
 	
-	    var render = $interval(function () {
-	        drawEverything();
-	    }, frameRate);
+	    var render = function render() {
+	        $interval(function () {
+	            drawEverything();
+	        }, frameRate);
+	    };
 	
 	    $window.addEventListener('resize', drawEverything, false);
-	
-	    $scope.load = function () {
-	        render;
-	    };
 	
 	    function drawEverything() {
 	
@@ -281,6 +278,7 @@
 	            relayBallSpeedX(-originalSpeedX);
 	            relayBallSpeedY(-originalSpeedY);
 	        } else {
+	
 	            tempScore2 += 1;
 	
 	            relayScore(tempScore, tempScore2);
@@ -290,6 +288,12 @@
 	        }
 	
 	        handleScore(tempScore, tempScore2);
+	    }
+	
+	    function joinRoom() {
+	        socket.emit("joinRoom", {
+	            room: room
+	        });
 	    }
 	
 	    function relayScore(p1, p2) {
@@ -324,10 +328,10 @@
 	    }
 	
 	    function moveBall() {
-	        var tempBallX = ballX += ballSpeedX;
-	        var tempBallY = ballY += ballSpeedY;
+	        ballX += ballSpeedX;
+	        ballY += ballSpeedY;
 	
-	        relayBallPosition(tempBallX, tempBallY);
+	        relayBallPosition(ballX, ballY);
 	
 	        handleHorizontal();
 	        handleVertical();

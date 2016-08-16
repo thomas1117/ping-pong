@@ -24,22 +24,17 @@ var {centerX,centerY,
 var player1;
 var player2;
 
-var tick = true;
-
-
 var myApp = angular.module('myApp',['ui.router']);
 
 myApp.config(['$stateProvider', '$urlRouterProvider','$locationProvider',function($stateProvider, $urlRouterProvider,$locationProvider){
 	$urlRouterProvider.otherwise('/landing');
     
     $stateProvider
-        
         .state('landing', {
             url: '/landing',
             templateUrl: './components/landing.html',
             controller: 'main'
         })
-         
         .state('game', {
         	url: '/game',
             templateUrl: './components/game.html',
@@ -55,6 +50,7 @@ myApp.controller('main',['$scope',function($scope){
             return;
         }
         if($scope.user) {
+        
             $scope.channel = randomstring(8);
             
         }
@@ -72,16 +68,17 @@ myApp.controller('main',['$scope',function($scope){
 }]);
 
 myApp.controller('game',['$scope','$window','$interval','$location',function($scope,$window,$interval,$location){
+    
     var socket = io();
     var users = [];
     
-    
-
     socket.on('connect',function(){
         
-        socket.emit("joinRoom",{
-            room:room
-        });
+        joinRoom();
+        render();
+        
+        
+        
 
         socket.on("playerAdd",function(resp){
             
@@ -144,13 +141,11 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     var canvas = document.getElementById("pong");
     var ctx = canvas.getContext("2d");
 
-    var render = $interval(function(){ drawEverything() },frameRate);
+    var render = function() {$interval(function(){ drawEverything() },frameRate) };
 
     $window.addEventListener('resize', drawEverything, false); 
 
-    $scope.load = function() {
-        render
-    }
+    
 
     
 
@@ -238,35 +233,36 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
         relayBallPosition(centerX,centerY)
         
-
         if(str==='goLeft') {
            
             tempScore+=1;
 
             relayScore(tempScore,tempScore2)
 
-            
-
             relayBallSpeedX(-originalSpeedX);
             relayBallSpeedY(-originalSpeedY);
+
         }
         else {
+
             tempScore2+=1;
 
-            relayScore(tempScore,tempScore2)
+            relayScore(tempScore,tempScore2);
 
 
             relayBallSpeedX(originalSpeedX);
             relayBallSpeedY(originalSpeedY);
+
         }
 
-        
+        handleScore(tempScore,tempScore2);
 
-        
+    }
 
-        handleScore(tempScore,tempScore2)
-        
-        
+    function joinRoom() {
+        socket.emit("joinRoom",{
+            room:room
+        });
     }
 
     function relayScore(p1,p2){
@@ -282,7 +278,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
        
         if(p1 === maxScore || p2 === maxScore) {
             $interval(function(){
-                $interval.cancel(render)
+                $interval.cancel(render);
             },frameRate);
 
             gameEnd();
@@ -307,12 +303,10 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
 
     function moveBall() {
-        var tempBallX = ballX += ballSpeedX;
-        var tempBallY = ballY += ballSpeedY
-
-        relayBallPosition(tempBallX,tempBallY);
-
-
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+        
+        relayBallPosition(ballX,ballY);
 
         handleHorizontal();
         handleVertical();
@@ -320,7 +314,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function relayBallPosition(x,y) {
-      
+        
         socket.emit("ballMove",{
             ballX:x,
             ballY:y
@@ -353,12 +347,12 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
                 relayBallSpeedX(tempBallSpeedX);
 
-                variableSpeed(paddle1Y)
+                variableSpeed(paddle1Y);
 
             }
             else {
                 if(ballX < 0) {
-                    resetGame('goRight')
+                    resetGame('goRight');
                 }
                 
             }
@@ -368,15 +362,15 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
-                tempBallSpeedX = -tempBallSpeedX
+                tempBallSpeedX = -tempBallSpeedX;
 
                 relayBallSpeedX(tempBallSpeedX);
 
-                variableSpeed(paddle2Y)
+                variableSpeed(paddle2Y);
             }
             else {
                 if(ballX > canvasWidth){
-                    resetGame('goLeft')
+                    resetGame('goLeft');
                 }
                 
             }
@@ -393,7 +387,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
         
 
-        relayBallSpeedY(tempBallSpeedY) 
+        relayBallSpeedY(tempBallSpeedY); 
         
     }
 
@@ -404,14 +398,14 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             tempBallSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(tempBallSpeedY)
+            relayBallSpeedY(tempBallSpeedY);
 
         }
         else if (ballY <=0) {
 
             tempBallSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(tempBallSpeedY)
+            relayBallSpeedY(tempBallSpeedY);
 
         }
     }

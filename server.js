@@ -77,7 +77,7 @@ function handleDisconnect(socket) {
 function playerAdd(req) {
   io.sockets.emit("playerAdd",{
       players:users
-    });
+  });
 }
 function sendPlayerData(req) {
   
@@ -116,5 +116,3 @@ function trackBallSpeedY(req) {
 app.get('*',function(req,res){
 	res.sendFile(__dirname + '/public/index.html');
 });
-
-
