@@ -174,11 +174,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         return evt.clientY;
        
     }
-
-
-
     
-
     canvas.addEventListener('mousemove',function(event){
             var tempPos;
 
@@ -231,7 +227,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     function resetGame(str){
 
         
-
+        console.log(centerX,centerY)
         relayBallPosition(centerX,centerY)
         
 
@@ -314,11 +310,12 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function relayBallPosition(x,y) {
+        console.log(x,y)
         socket.emit("ballMove",{
             ballX:x,
             ballY:y
         });
-        
+
     }
 
     function relayBallSpeedX(x) {

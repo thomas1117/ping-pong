@@ -5,6 +5,14 @@ body {
 	overflow-y:hidden;
 	padding:0;
 	margin:0;
+	background-color: #000;
+}
+
+#pong {
+	width:1600px;
+	position: relative;
+	margin:auto;
+	display: block;
 }
 
 

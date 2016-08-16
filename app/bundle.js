@@ -94,7 +94,7 @@
 	
 	var myApp = _angular2.default.module('myApp', ['ui.router']);
 	
-	myApp.config(function ($stateProvider, $urlRouterProvider, $locationProvider) {
+	myApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
 	    $urlRouterProvider.otherwise('/landing');
 	
 	    $stateProvider.state('landing', {
@@ -107,9 +107,9 @@
 	        controller: 'game'
 	
 	    });
-	});
+	}]);
 	
-	myApp.controller('main', function ($scope) {
+	myApp.controller('main', ['$scope', function ($scope) {
 	
 	    $scope.generateGame = function (user) {
 	        if ($scope.channel) {
@@ -127,13 +127,11 @@
 	            username: user
 	        });
 	    };
-	});
+	}]);
 	
 	myApp.controller('game', ['$scope', '$window', '$interval', '$location', function ($scope, $window, $interval, $location) {
 	    var socket = io();
 	    var users = [];
-	
-	    console.log('testing');
 	
 	    socket.on('connect', function () {
 	
@@ -264,6 +262,7 @@
 	
 	    function resetGame(str) {
 	
+	        console.log(centerX, centerY);
 	        relayBallPosition(centerX, centerY);
 	
 	        if (str === 'goLeft') {
@@ -325,6 +324,7 @@
 	    }
 	
 	    function relayBallPosition(x, y) {
+	        console.log(x, y);
 	        socket.emit("ballMove", {
 	            ballX: x,
 	            ballY: y
@@ -19441,37 +19441,43 @@
 
 	"use strict";
 	
-	var canvasWidth = window.innerWidth;
-	var canvasHeight = window.innerHeight;
+	var canvasWidth = 1600;
+	var canvasHeight = 880;
+	
+	// var canvasWidth = window.innerWidth;
+	// var canvasHeight = window.innerHeight;
 	
 	var centerX = canvasWidth / 2;
 	var centerY = canvasHeight / 2;
 	
-	var paddleWidth = window.innerWidth / 40;
-	var paddleHeight = window.innerHeight / 5;
+	// var paddleWidth = window.innerWidth/40;
+	// var paddleHeight = window.innerHeight/5;
+	
+	var paddleWidth = 50;
+	var paddleHeight = 200;
 	
 	var paddle1Y = (canvasHeight - paddleHeight) / 2;
 	var paddle2Y = (canvasHeight - paddleHeight) / 2;
 	
 	var ballSize = 12;
 	
-	var ballSpeedX = 8;
-	var ballSpeedY = 12;
+	var ballSpeedX = 22;
+	var ballSpeedY = 26;
 	
-	var originalSpeedX = 8;
-	var originalSpeedY = 12;
+	var originalSpeedX = 22;
+	var originalSpeedY = 26;
 	
 	var ballX = canvasWidth / 2;
 	var ballY = canvasHeight / 2;
 	
-	var speedConst = .25;
+	var speedConst = .28;
 	
 	var player1Score = 0;
 	var player2Score = 0;
 	var maxScore = 10;
 	
 	var ticking = true;
-	var frameRate = 20;
+	var frameRate = 60;
 	
 	module.exports = {
 	    centerX: centerX,
