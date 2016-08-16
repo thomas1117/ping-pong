@@ -15,77 +15,70 @@ var users = [];
 
 io.on('connection', function(socket){
 	
-  	socket.on('disconnect',function(){
-  		var userData = clientInfo[socket.id];
-  		
-  		if(typeof socket.id !=='undefined') {
-  			socket.leave(socket.room);
-  			users = users.filter(function(obj){
-  			
-    			if(obj.id !== clientInfo.id) {
-    				return true;
-    			}
+  socket.on('disconnect',function(){
+  	handleDisconnect(socket)
+  });
 
-  			});
-  		
-      clientInfo = {};
+  socket.on('moveY',function(req){
+    sendPlayerData(req);
+  });
 
-  		}
+  socket.on("score",function(req){
+    trackScore(req);
+  });
 
-  		
+  socket.on("ballMove",function(req){
+    trackBallPosition(req);
+  });
 
-  	})
+  socket.on("ballSpeedX",function(req){
+    trackBallSpeedX(req);  
+  });
 
-    socket.on('moveY',function(req){
-      sendPlayerData(req);
-    });
+  socket.on("ballSpeedY",function(req){
+    trackBallSpeedY(req); 
+  });
 
-    socket.on("score",function(req){
-        io.sockets.emit("scoreTrack",{
-          player1Score:req.player1Score,
-          player2Score:req.player2Score
-        });
-    })
+  socket.on("username",function(req){
+    clientInfo['username'] = req.username;
+  });
 
-    socket.on("ballMove",function(req){
-        io.sockets.emit("ballPosition",{
-          ballX:req.ballX,
-          ballY:req.ballY
-        });
-    })
+  socket.on("joinRoom",function(req){
+    clientInfo['id'] = socket.id;
+    clientInfo['room'] = req.room;
 
-    socket.on("ballSpeedX",function(req){
+    users.push(clientInfo);
 
-        io.sockets.emit("ballSpeedTrackX",{
-        ballSpeedX:req.ballSpeedX
-        });
-    })
+    playerAdd(req);
+  });
 
-    socket.on("ballSpeedY",function(req){
-
-        io.sockets.emit("ballSpeedTrackY",{
-        ballSpeedY:req.ballSpeedY
-        });
-    })
-
-	socket.on("username",function(req){
-		clientInfo['username'] = req.username;
-	})
-
-	socket.on("joinRoom",function(req){
-		
-	
-		clientInfo['id'] = socket.id;
-		clientInfo['room'] = req.room;
-		users.push(clientInfo);
-
-		io.sockets.emit("playerAdd",{
-			players:users
-		});
-	
-	})
 });
 
+function handleDisconnect(socket) {
+  var userData = clientInfo[socket.id];
+      
+  if(typeof socket.id !=='undefined') {
+    socket.leave(socket.room);
+
+    users = users.filter(function(obj){
+      
+      if(obj.id !== clientInfo.id) {
+        return true;
+      }
+
+    });
+  
+  clientInfo = {};
+
+  }
+  return;
+}
+
+function playerAdd(req) {
+  io.sockets.emit("playerAdd",{
+      players:users
+    });
+}
 function sendPlayerData(req) {
   
   io.sockets.emit('paddleMove',{
@@ -93,6 +86,32 @@ function sendPlayerData(req) {
     position:req.position
   })
 };
+
+function trackScore(req) {
+  io.sockets.emit("scoreTrack",{
+    player1Score:req.player1Score,
+    player2Score:req.player2Score
+  });
+};
+
+function trackBallPosition(req) {
+  io.sockets.emit("ballPosition",{
+          ballX:req.ballX,
+          ballY:req.ballY
+  });
+}
+
+function trackBallSpeedX(req) {
+  io.sockets.emit("ballSpeedTrackX",{
+        ballSpeedX:req.ballSpeedX
+  });
+}
+
+function trackBallSpeedY(req) {
+  io.sockets.emit("ballSpeedTrackY",{
+        ballSpeedY:req.ballSpeedY
+  });
+}
 
 app.get('*',function(req,res){
 	res.sendFile(__dirname + '/public/index.html');

@@ -96,7 +96,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         });
 
         socket.on("scoreTrack",function(resp){
-                
+            
             player1Score = resp.player1Score;
             player2Score = resp.player2Score;
 
@@ -307,9 +307,10 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
 
     function moveBall() {
-        
+        var tempBallX = ballX += ballSpeedX;
+        var tempBallY = ballY += ballSpeedY
 
-        relayBallPosition(ballX += ballSpeedX,ballY += ballSpeedY);
+        relayBallPosition(tempBallX,tempBallY);
 
 
 
@@ -341,12 +342,16 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
 
     function handleHorizontal() {
+        var tempBallSpeedX = ballSpeedX;
+
         if(ballX < 0 + paddleWidth) {
+
             if(ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+                
+                tempBallSpeedX = -tempBallSpeedX;
 
-                relayBallSpeedX(ballSpeedX);
+                relayBallSpeedX(tempBallSpeedX);
 
                 variableSpeed(paddle1Y)
 
@@ -363,9 +368,9 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             if(ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
                 
-                ballSpeedX = -ballSpeedX;
+                tempBallSpeedX = -tempBallSpeedX
 
-                relayBallSpeedX(ballSpeedX);
+                relayBallSpeedX(tempBallSpeedX);
 
                 variableSpeed(paddle2Y)
             }
@@ -380,30 +385,33 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function variableSpeed(paddle) {
+        var tempBallSpeedY;
 
         var deltaY = ballY - (paddle +paddleHeight/2);
 
-        ballSpeedY = Math.floor(deltaY * speedConst);  
+        tempBallSpeedY = Math.floor(deltaY * speedConst);  
 
         
 
-        relayBallSpeedY(ballSpeedY) 
+        relayBallSpeedY(tempBallSpeedY) 
         
     }
 
     function handleVertical() {
+        var tempBallSpeedY;
+
         if(ballY > canvasHeight) {
 
-            ballSpeedY = -ballSpeedY;
+            tempBallSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(ballSpeedY)
+            relayBallSpeedY(tempBallSpeedY)
 
         }
         else if (ballY <=0) {
 
-            ballSpeedY = -ballSpeedY;
+            tempBallSpeedY = -ballSpeedY;
 
-            relayBallSpeedY(ballSpeedY)
+            relayBallSpeedY(tempBallSpeedY)
 
         }
     }

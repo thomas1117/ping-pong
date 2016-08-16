@@ -324,8 +324,10 @@
 	    }
 	
 	    function moveBall() {
+	        var tempBallX = ballX += ballSpeedX;
+	        var tempBallY = ballY += ballSpeedY;
 	
-	        relayBallPosition(ballX += ballSpeedX, ballY += ballSpeedY);
+	        relayBallPosition(tempBallX, tempBallY);
 	
 	        handleHorizontal();
 	        handleVertical();
@@ -352,12 +354,15 @@
 	    }
 	
 	    function handleHorizontal() {
+	        var tempBallSpeedX = ballSpeedX;
+	
 	        if (ballX < 0 + paddleWidth) {
+	
 	            if (ballY > paddle1Y && ballY < paddle1Y + paddleHeight) {
 	
-	                ballSpeedX = -ballSpeedX;
+	                tempBallSpeedX = -tempBallSpeedX;
 	
-	                relayBallSpeedX(ballSpeedX);
+	                relayBallSpeedX(tempBallSpeedX);
 	
 	                variableSpeed(paddle1Y);
 	            } else {
@@ -369,9 +374,9 @@
 	
 	            if (ballY > paddle2Y && ballY < paddle2Y + paddleHeight) {
 	
-	                ballSpeedX = -ballSpeedX;
+	                tempBallSpeedX = -tempBallSpeedX;
 	
-	                relayBallSpeedX(ballSpeedX);
+	                relayBallSpeedX(tempBallSpeedX);
 	
 	                variableSpeed(paddle2Y);
 	            } else {
@@ -383,25 +388,28 @@
 	    }
 	
 	    function variableSpeed(paddle) {
+	        var tempBallSpeedY;
 	
 	        var deltaY = ballY - (paddle + paddleHeight / 2);
 	
-	        ballSpeedY = Math.floor(deltaY * speedConst);
+	        tempBallSpeedY = Math.floor(deltaY * speedConst);
 	
-	        relayBallSpeedY(ballSpeedY);
+	        relayBallSpeedY(tempBallSpeedY);
 	    }
 	
 	    function handleVertical() {
+	        var tempBallSpeedY;
+	
 	        if (ballY > canvasHeight) {
 	
-	            ballSpeedY = -ballSpeedY;
+	            tempBallSpeedY = -ballSpeedY;
 	
-	            relayBallSpeedY(ballSpeedY);
+	            relayBallSpeedY(tempBallSpeedY);
 	        } else if (ballY <= 0) {
 	
-	            ballSpeedY = -ballSpeedY;
+	            tempBallSpeedY = -ballSpeedY;
 	
-	            relayBallSpeedY(ballSpeedY);
+	            relayBallSpeedY(tempBallSpeedY);
 	        }
 	    }
 	}]);
