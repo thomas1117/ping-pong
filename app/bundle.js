@@ -92,6 +92,8 @@
 	var player1;
 	var player2;
 	
+	var tick = true;
+	
 	var myApp = _angular2.default.module('myApp', ['ui.router']);
 	
 	myApp.config(['$stateProvider', '$urlRouterProvider', '$locationProvider', function ($stateProvider, $urlRouterProvider, $locationProvider) {
@@ -219,73 +221,79 @@
 	
 	    canvas.addEventListener('mousemove', function (event) {
 	        var tempPos;
+	        var tempPos = paddle1Y;
+	        var tempPos2 = paddle2Y;
 	
 	        if (socket.id === player1) {
 	
 	            var mousePos = calculateMousePos(event);
 	
-	            paddle1Y = mousePos - paddleHeight / 2;
+	            tempPos = mousePos - paddleHeight / 2;
 	
-	            if (paddle1Y <= 0) {
+	            if (tempPos <= 0) {
 	
-	                paddle1Y = 0;
-	            } else if (paddle1Y + paddleHeight >= canvasHeight) {
+	                tempPos = 0;
+	            } else if (tempPos + paddleHeight >= canvasHeight) {
 	
-	                paddle1Y = canvasHeight - paddleHeight;
+	                tempPos = canvasHeight - paddleHeight;
 	            }
 	
-	            socket.emit("moveY", {
-	                position: paddle1Y,
-	                player: "player1"
-	            });
+	            movePaddle(tempPos, 'player1');
 	        } else if (socket.id === player2) {
 	
 	            if (socket.id === player2) {
 	                var mousePos = calculateMousePos(event);
 	
-	                paddle2Y = mousePos - paddleHeight / 2;
+	                tempPos2 = mousePos - paddleHeight / 2;
 	
-	                if (paddle2Y <= 0) {
+	                if (tempPos2 <= 0) {
 	
-	                    paddle2Y = 0;
-	                } else if (paddle2Y + paddleHeight >= canvasHeight) {
+	                    tempPos2 = 0;
+	                } else if (tempPos2 + paddleHeight >= canvasHeight) {
 	
-	                    paddle2Y = canvasHeight - paddleHeight;
+	                    tempPos2 = canvasHeight - paddleHeight;
 	                }
 	            }
-	            socket.emit("moveY", {
-	                position: paddle2Y,
-	                player: "player2"
-	            });
+	
+	            movePaddle(tempPos2, 'player2');
 	        }
 	    });
 	
+	    function movePaddle(paddle, player) {
+	        socket.emit("moveY", {
+	            position: paddle,
+	            player: player
+	        });
+	    }
+	
 	    function resetGame(str) {
+	        var tempScore = player1Score;
+	        var tempScore2 = player2Score;
 	
 	        relayBallPosition(centerX, centerY);
 	
 	        if (str === 'goLeft') {
 	
-	            player1Score += 1;
+	            tempScore += 1;
 	
-	            relayScore(player1Score, player2Score);
+	            relayScore(tempScore, tempScore2);
 	
 	            relayBallSpeedX(-originalSpeedX);
 	            relayBallSpeedY(-originalSpeedY);
 	        } else {
-	            player2Score += 1;
+	            tempScore2 += 1;
 	
-	            relayScore(player1Score, player2Score);
+	            relayScore(tempScore, tempScore2);
 	
 	            relayBallSpeedX(originalSpeedX);
 	            relayBallSpeedY(originalSpeedY);
 	        }
 	
-	        handleScore(player1Score, player2Score);
+	        handleScore(tempScore, tempScore2);
 	    }
 	
 	    function relayScore(p1, p2) {
-	        console.log('relayed score ', p1, p2);
+	
 	        socket.emit("score", {
 	            player1Score: p1,
 	            player2Score: p2
@@ -378,7 +386,7 @@
 	
 	        var deltaY = ballY - (paddle + paddleHeight / 2);
 	
-	        ballSpeedY = deltaY * speedConst;
+	        ballSpeedY = Math.floor(deltaY * speedConst);
 	
 	        relayBallSpeedY(ballSpeedY);
 	    }

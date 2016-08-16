@@ -84,16 +84,18 @@ io.on('connection', function(socket){
 		});
 	
 	})
-})
+});
+
+function sendPlayerData(req) {
+  
+  io.sockets.emit('paddleMove',{
+    player:req.player,
+    position:req.position
+  })
+};
 
 app.get('*',function(req,res){
 	res.sendFile(__dirname + '/public/index.html');
 });
 
-function sendPlayerData(req) {
-	
-	io.sockets.emit('paddleMove',{
-    player:req.player,
-		position:req.position
-	})
-};
+
