@@ -262,7 +262,6 @@
 	
 	    function resetGame(str) {
 	
-	        console.log(centerX, centerY);
 	        relayBallPosition(centerX, centerY);
 	
 	        if (str === 'goLeft') {
@@ -286,6 +285,7 @@
 	    }
 	
 	    function relayScore(p1, p2) {
+	        console.log('relayed score ', p1, p2);
 	        socket.emit("score", {
 	            player1Score: p1,
 	            player2Score: p2
@@ -324,7 +324,7 @@
 	    }
 	
 	    function relayBallPosition(x, y) {
-	        console.log(x, y);
+	
 	        socket.emit("ballMove", {
 	            ballX: x,
 	            ballY: y

@@ -227,7 +227,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     function resetGame(str){
 
         
-        console.log(centerX,centerY)
+       
         relayBallPosition(centerX,centerY)
         
 
@@ -262,6 +262,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function relayScore(p1,p2){
+        console.log('relayed score ',p1,p2)
         socket.emit("score",{
             player1Score:p1,
             player2Score:p2
@@ -310,7 +311,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function relayBallPosition(x,y) {
-        console.log(x,y)
+      
         socket.emit("ballMove",{
             ballX:x,
             ballY:y
