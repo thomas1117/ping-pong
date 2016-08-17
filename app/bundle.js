@@ -136,6 +136,12 @@
 	    var socket = io();
 	    var users = [];
 	
+	    function interval() {
+	        setInterval(function () {
+	            drawEverything();
+	        }, frameRate);
+	    }
+	
 	    socket.on('connect', function () {
 	
 	        joinRoom();
@@ -153,14 +159,10 @@
 	                users[1] = player2;
 	            }
 	
-	            if (users[0] !== 'undefined' && users[1] !== 'undefined') {
+	            if (users[0] !== undefined && users[1] !== undefined) {
 	
-	                $interval(function () {
-	                    drawEverything();
-	                }, frameRate);
+	                interval();
 	            }
-	            console.log(users[0], users[1]);
-	            render(users);
 	        });
 	
 	        socket.on("scoreTrack", function (resp) {
