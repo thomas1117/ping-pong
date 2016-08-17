@@ -135,13 +135,6 @@
 	
 	    var socket = io();
 	    var users = [];
-	    var render = tick === true ? function () {
-	        $interval(function () {
-	            drawEverything();
-	        }, frameRate);
-	    } : function () {
-	        console.log(users);
-	    };
 	
 	    socket.on('connect', function () {
 	
@@ -167,6 +160,14 @@
 	
 	            render(users);
 	        });
+	
+	        var render = tick === true ? function () {
+	            $interval(function () {
+	                drawEverything();
+	            }, frameRate);
+	        } : function () {
+	            console.log(users);
+	        };
 	
 	        socket.on("scoreTrack", function (resp) {
 	
