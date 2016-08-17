@@ -79,7 +79,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         joinRoom();
  
         socket.on("playerAdd",function(resp){
-            console.log(resp)
+            console.log('here it is',resp)
             player1 = resp.players[0].id.substring(2);
 
             users[0] = player1;
@@ -93,14 +93,14 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             if(users[0]!=='undefined' && users[1]!=='undefined'){
                 
-                tick = true;
+                $interval(function(){ drawEverything()},frameRate);
             }
-            console.log(users[0],users[1])
-            render(users);
+           
+            
                 
         });
 
-        var render = tick===true ? function(){$interval(function(){ drawEverything()},frameRate)} : function(){console.log(users)};
+
         
         
 
