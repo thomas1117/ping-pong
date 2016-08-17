@@ -91,6 +91,7 @@
 	
 	var player1;
 	var player2;
+	var tick = false;
 	
 	var myApp = _angular2.default.module('myApp', ['ui.router']);
 	
@@ -134,6 +135,13 @@
 	
 	    var socket = io();
 	    var users = [];
+	    var render = tick === true ? function () {
+	        $interval(function () {
+	            drawEverything();
+	        }, frameRate);
+	    } : function () {
+	        console.log('nope');
+	    };
 	
 	    socket.on('connect', function () {
 	
@@ -154,10 +162,10 @@
 	
 	            if (users.length === 2) {
 	
-	                var render = $interval(function () {
-	                    drawEverything();
-	                }, frameRate);
+	                tick = true;
 	            }
+	
+	            render();
 	        });
 	
 	        socket.on("scoreTrack", function (resp) {
@@ -206,7 +214,7 @@
 	        (0, _drawShapes.drawBackground)(canvas, ctx, canvasWidth, canvasHeight, '#000');
 	
 	        (0, _drawShapes.drawPaddle1)(ctx, 0, paddle1Y, '#fff', paddleWidth, paddleHeight);
-	        (0, _drawShapes.drawPaddle2)(ctx, canvasWidth - paddleWidth, paddle2Y, '#fff', paddleWidth, paddleHeight);
+	        // drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
 	
 	        (0, _drawShapes.drawScores)(ctx, player1Score, player2Score, canvasWidth);
 	

@@ -23,6 +23,7 @@ var {centerX,centerY,
 
 var player1;
 var player2;
+var tick = false;
 
 var myApp = angular.module('myApp',['ui.router']);
 
@@ -71,13 +72,12 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     
     var socket = io();
     var users = [];
+    var render = tick===true ? function(){$interval(function(){ drawEverything()},frameRate)} : function(){console.log('nope')};
     
     socket.on('connect',function(){
-        console.log('connected')
+        
         joinRoom();
-
-        
-        
+ 
         socket.on("playerAdd",function(resp){
 
             player1 = resp.players[0].id.substring(2);
@@ -93,9 +93,10 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             if(users.length===2){
                 
-                var render = $interval(function(){ drawEverything() },frameRate);
+                tick = true;
             }
             
+            render();
                 
         });
         
@@ -158,7 +159,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
 
         drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
-        drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
+        // drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
 
         drawScores(ctx,player1Score,player2Score,canvasWidth);
 
