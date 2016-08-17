@@ -136,18 +136,15 @@
 	    var socket = io();
 	    var users = [];
 	
-	    function interval() {
-	        setInterval(function () {
-	            drawEverything();
-	        }, frameRate);
-	    }
+	    var render;
 	
 	    socket.on('connect', function () {
 	
 	        joinRoom();
 	
 	        socket.on("playerAdd", function (resp) {
-	            console.log('here it is', resp);
+	            console.log(resp);
+	
 	            player1 = resp.players[0].id.substring(2);
 	
 	            users[0] = player1;
@@ -161,7 +158,9 @@
 	
 	            if (users[0] !== undefined && users[1] !== undefined) {
 	
-	                interval();
+	                setInterval(function () {
+	                    drawEverything();
+	                }, frameRate);
 	            }
 	        });
 	
@@ -297,6 +296,7 @@
 	    }
 	
 	    function joinRoom() {
+	
 	        socket.emit("joinRoom", {
 	            room: room
 	        });
@@ -313,9 +313,8 @@
 	    function handleScore(p1, p2) {
 	
 	        if (p1 === maxScore || p2 === maxScore) {
-	            $interval(function () {
-	                $interval.cancel(render);
-	            }, frameRate);
+	
+	            window.clearInterval(render);
 	
 	            gameEnd();
 	        }
@@ -19467,8 +19466,11 @@
 
 	"use strict";
 	
-	var canvasWidth = 1600;
-	var canvasHeight = 880;
+	// var canvasWidth = 1600;
+	// var canvasHeight = 880;
+	
+	var canvasWidth = 900;
+	var canvasHeight = 500;
 	
 	// var canvasWidth = window.innerWidth;
 	// var canvasHeight = window.innerHeight;
@@ -19479,8 +19481,8 @@
 	// var paddleWidth = window.innerWidth/40;
 	// var paddleHeight = window.innerHeight/5;
 	
-	var paddleWidth = 50;
-	var paddleHeight = 200;
+	var paddleWidth = 20;
+	var paddleHeight = 100;
 	
 	var paddle1Y = (canvasHeight - paddleHeight) / 2;
 	var paddle2Y = (canvasHeight - paddleHeight) / 2;

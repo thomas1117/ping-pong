@@ -73,19 +73,17 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     var socket = io();
     var users = [];
 
-    function interval() {
-        setInterval(function(){
-                    drawEverything()
-                },frameRate)
-    }
+    var render;
+
     
     
     socket.on('connect',function(){
         
         joinRoom();
- 
+
         socket.on("playerAdd",function(resp){
-            console.log('here it is',resp)
+            console.log(resp)
+          
             player1 = resp.players[0].id.substring(2);
 
             users[0] = player1;
@@ -99,16 +97,15 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
 
             if(users[0]!==undefined && users[1]!==undefined){
                 
-                interval()
+                 setInterval(function(){
+                    drawEverything()
+                },frameRate)
                 
             }
            
             
                 
         });
-
-
-        
         
 
         socket.on("scoreTrack",function(resp){
@@ -272,6 +269,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     }
 
     function joinRoom() {
+        
         socket.emit("joinRoom",{
             room:room
         });
@@ -289,9 +287,9 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     function handleScore(p1,p2) {
        
         if(p1 === maxScore || p2 === maxScore) {
-            $interval(function(){
-                $interval.cancel(render);
-            },frameRate);
+            
+                window.clearInterval(render);
+            
 
             gameEnd();
             

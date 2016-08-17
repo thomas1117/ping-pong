@@ -12,11 +12,16 @@ http.listen(app.get('port'), '0.0.0.0', function() {
 
 var clientInfo = {};
 var users = [];
+var index;
 
 io.on('connection', function(socket){
 	
   socket.on('disconnect',function(){
-  	handleDisconnect(socket)
+  	handleDisconnect(socket);
+  });
+
+  socket.on("joinRoom",function(req){
+    handleJoin(req,socket);
   });
 
   socket.on('moveY',function(req){
@@ -43,16 +48,7 @@ io.on('connection', function(socket){
     clientInfo['username'] = req.username;
   });
 
-  socket.on("joinRoom",function(req){
-    clientInfo['id'] = socket.id;
-    clientInfo['room'] = req.room;
-
-    users.push(clientInfo);
-
-    
-
-    playerAdd(users);
-  });
+  
 
 });
 
@@ -62,23 +58,31 @@ function handleDisconnect(socket) {
   if(typeof socket.id !=='undefined') {
     socket.leave(socket.room);
 
-    users = users.filter(function(obj){
-      
-      if(obj.id !== clientInfo.id) {
-        return true;
-      }
+    
+    users = users.slice(index+1,1);
 
-    });
-  
-  clientInfo = {};
-
-
+    clientInfo = {};
 
   }
-  return;
+ 
+}
+
+function handleJoin(req,socket) {
+  clientInfo['id'] = socket.id;
+  clientInfo['room'] = req.room;
+
+
+  users.push(clientInfo);
+
+  index = users.length - 1;
+    
+  playerAdd(users);
 }
 
 function playerAdd(users) {
+
+  console.log('here are users at player add',users);
+
   io.sockets.emit("playerAdd",{
       players:users
   });
@@ -100,8 +104,8 @@ function trackScore(req) {
 
 function trackBallPosition(req) {
   io.sockets.emit("ballPosition",{
-          ballX:req.ballX,
-          ballY:req.ballY
+    ballX:req.ballX,
+    ballY:req.ballY
   });
 }
 

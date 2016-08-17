@@ -1,5 +1,8 @@
-var canvasWidth = 1600;
-var canvasHeight = 880;
+// var canvasWidth = 1600;
+// var canvasHeight = 880;
+
+var canvasWidth = 900;
+var canvasHeight = 500;
 
 // var canvasWidth = window.innerWidth;
 // var canvasHeight = window.innerHeight;
@@ -11,8 +14,8 @@ var centerY = canvasHeight/2;
 // var paddleWidth = window.innerWidth/40;
 // var paddleHeight = window.innerHeight/5;
 
-var paddleWidth = 50;
-var paddleHeight = 200;
+var paddleWidth = 20;
+var paddleHeight = 100;
 
 var paddle1Y = (canvasHeight - paddleHeight)/2
 var paddle2Y = (canvasHeight - paddleHeight)/2;
