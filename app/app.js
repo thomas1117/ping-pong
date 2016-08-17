@@ -73,7 +73,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     var users = [];
     
     socket.on('connect',function(){
-        
+        console.log('connected')
         joinRoom();
 
         
@@ -95,7 +95,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
                 
                 var render = $interval(function(){ drawEverything() },frameRate);
             }
-            console.log('users',users)
+            
                 
         });
         
