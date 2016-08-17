@@ -49,6 +49,8 @@ io.on('connection', function(socket){
 
     users.push(clientInfo);
 
+    console.log(users)
+
     playerAdd(req);
   });
 
@@ -69,6 +71,8 @@ function handleDisconnect(socket) {
     });
   
   clientInfo = {};
+
+
 
   }
   return;

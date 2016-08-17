@@ -138,16 +138,25 @@
 	    socket.on('connect', function () {
 	
 	        joinRoom();
-	        render();
 	
 	        socket.on("playerAdd", function (resp) {
 	
 	            player1 = resp.players[0].id.substring(2);
-	            users.push(player1);
+	
+	            users[0] = player1;
 	
 	            if (resp.players[1]) {
+	
 	                player2 = resp.players[1].id.substring(2);
-	                users.push(player2);
+	
+	                users[1] = player2;
+	            }
+	
+	            if (users.length === 2) {
+	
+	                var render = $interval(function () {
+	                    drawEverything();
+	                }, frameRate);
 	            }
 	        });
 	
@@ -155,6 +164,8 @@
 	
 	            player1Score = resp.player1Score;
 	            player2Score = resp.player2Score;
+	
+	            handleScore(player1Score, player2Score);
 	        });
 	
 	        socket.on("paddleMove", function (resp) {
@@ -189,14 +200,6 @@
 	
 	    var canvas = document.getElementById("pong");
 	    var ctx = canvas.getContext("2d");
-	
-	    var render = function render() {
-	        $interval(function () {
-	            drawEverything();
-	        }, frameRate);
-	    };
-	
-	    $window.addEventListener('resize', drawEverything, false);
 	
 	    function drawEverything() {
 	
@@ -286,8 +289,6 @@
 	            relayBallSpeedX(originalSpeedX);
 	            relayBallSpeedY(originalSpeedY);
 	        }
-	
-	        handleScore(tempScore, tempScore2);
 	    }
 	
 	    function joinRoom() {
