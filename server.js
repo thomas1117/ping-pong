@@ -49,9 +49,9 @@ io.on('connection', function(socket){
 
     users.push(clientInfo);
 
-    console.log(users)
+    
 
-    playerAdd(req);
+    playerAdd(users);
   });
 
 });
@@ -78,7 +78,7 @@ function handleDisconnect(socket) {
   return;
 }
 
-function playerAdd(req) {
+function playerAdd(users) {
   io.sockets.emit("playerAdd",{
       players:users
   });

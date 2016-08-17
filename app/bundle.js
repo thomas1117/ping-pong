@@ -141,7 +141,7 @@
 	        joinRoom();
 	
 	        socket.on("playerAdd", function (resp) {
-	
+	            console.log(resp);
 	            player1 = resp.players[0].id.substring(2);
 	
 	            users[0] = player1;
@@ -153,11 +153,11 @@
 	                users[1] = player2;
 	            }
 	
-	            if (users.length === 2) {
+	            if (users[0] !== 'undefined' && users[1] !== 'undefined') {
 	
 	                tick = true;
 	            }
-	
+	            console.log(users[0], users[1]);
 	            render(users);
 	        });
 	
@@ -215,7 +215,7 @@
 	        (0, _drawShapes.drawBackground)(canvas, ctx, canvasWidth, canvasHeight, '#000');
 	
 	        (0, _drawShapes.drawPaddle1)(ctx, 0, paddle1Y, '#fff', paddleWidth, paddleHeight);
-	        // drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
+	        (0, _drawShapes.drawPaddle2)(ctx, canvasWidth - paddleWidth, paddle2Y, '#fff', paddleWidth, paddleHeight);
 	
 	        (0, _drawShapes.drawScores)(ctx, player1Score, player2Score, canvasWidth);
 	

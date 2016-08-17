@@ -79,7 +79,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         joinRoom();
  
         socket.on("playerAdd",function(resp){
-
+            console.log(resp)
             player1 = resp.players[0].id.substring(2);
 
             users[0] = player1;
@@ -91,11 +91,11 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
                 users[1] = player2;
             }
 
-            if(users.length===2){
+            if(users[0]!=='undefined' && users[1]!=='undefined'){
                 
                 tick = true;
             }
-            
+            console.log(users[0],users[1])
             render(users);
                 
         });
@@ -161,7 +161,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
         drawBackground(canvas,ctx,canvasWidth,canvasHeight,'#000');
 
         drawPaddle1(ctx,0,paddle1Y,'#fff',paddleWidth,paddleHeight);
-        // drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
+        drawPaddle2(ctx,canvasWidth-paddleWidth,paddle2Y,'#fff',paddleWidth,paddleHeight);
 
         drawScores(ctx,player1Score,player2Score,canvasWidth);
 
