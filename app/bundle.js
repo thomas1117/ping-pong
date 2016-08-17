@@ -140,7 +140,7 @@
 	            drawEverything();
 	        }, frameRate);
 	    } : function () {
-	        console.log('nope');
+	        console.log(users);
 	    };
 	
 	    socket.on('connect', function () {
@@ -165,7 +165,7 @@
 	                tick = true;
 	            }
 	
-	            render();
+	            render(users);
 	        });
 	
 	        socket.on("scoreTrack", function (resp) {

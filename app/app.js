@@ -72,7 +72,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
     
     var socket = io();
     var users = [];
-    var render = tick===true ? function(){$interval(function(){ drawEverything()},frameRate)} : function(){console.log('nope')};
+    var render = tick===true ? function(){$interval(function(){ drawEverything()},frameRate)} : function(){console.log(users)};
     
     socket.on('connect',function(){
         
@@ -96,7 +96,7 @@ myApp.controller('game',['$scope','$window','$interval','$location',function($sc
                 tick = true;
             }
             
-            render();
+            render(users);
                 
         });
         
