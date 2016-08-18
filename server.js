@@ -15,7 +15,7 @@ var users = [];
 var index;
 
 io.on('connection', function(socket){
-	
+  
   socket.on('disconnect',function(){
   	handleDisconnect(socket);
   });
@@ -48,8 +48,6 @@ io.on('connection', function(socket){
     clientInfo['username'] = req.username;
   });
 
-  
-
 });
 
 function handleDisconnect(socket) {
@@ -58,8 +56,11 @@ function handleDisconnect(socket) {
   if(typeof socket.id !=='undefined') {
     socket.leave(socket.room);
 
-    
-    users = users.slice(index+1,1);
+    users = users.filter(function(item,i){
+      return i !== index;
+    });
+
+    console.log('at disconnect',users)
 
     clientInfo = {};
 
@@ -71,8 +72,25 @@ function handleJoin(req,socket) {
   clientInfo['id'] = socket.id;
   clientInfo['room'] = req.room;
 
+  if(users.length===0){
+    users.push(clientInfo);
+  }
 
-  users.push(clientInfo);
+  else {
+    
+    users.forEach(function(data){
+      
+      if(data.id === clientInfo.id){
+        console.log('it equals')
+      }
+
+      else {
+        users.push(clientInfo);
+      }
+
+    });
+    console.log('users at handleJoin ',users)
+  }
 
   index = users.length - 1;
     

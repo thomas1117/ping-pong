@@ -142,27 +142,31 @@
 	
 	        joinRoom();
 	
-	        socket.on("playerAdd", function (resp) {
-	            console.log(resp);
+	        // socket.on("playerAdd",function(resp){
+	        //     console.log(resp)
 	
-	            player1 = resp.players[0].id.substring(2);
+	        //     player1 = resp.players[0].id.substring(2);
 	
-	            users[0] = player1;
+	        //     users[0] = player1;
 	
-	            if (resp.players[1]) {
+	        //     if(resp.players[1]) {
 	
-	                player2 = resp.players[1].id.substring(2);
+	        //         player2 = resp.players[1].id.substring(2);
 	
-	                users[1] = player2;
-	            }
+	        //         users[1] = player2;
+	        //     }
 	
-	            if (users[0] !== undefined && users[1] !== undefined) {
+	        //     if(users[0]!==undefined && users[1]!==undefined){
 	
-	                setInterval(function () {
-	                    drawEverything();
-	                }, frameRate);
-	            }
-	        });
+	        //          setInterval(function(){
+	        //             drawEverything()
+	        //         },frameRate)
+	
+	        //     }
+	
+	
+	        // });
+	
 	
 	        socket.on("scoreTrack", function (resp) {
 	
